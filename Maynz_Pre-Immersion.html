@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business AI — Pre-Blueprint Prep · Rob Tuaati</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hi-vis:#F5A623;--hi-vis-dim:rgba(245,166,35,0.12);--hi-vis-border:rgba(245,166,35,0.28);
+  --concrete:#111418;--concrete-2:#191D23;--concrete-3:#21262E;--concrete-4:#2C3340;
+  --text:#E8ECF0;--text-muted:#7A8899;--text-dim:#3D4A58;
+  --border:rgba(232,236,240,0.07);--border-2:rgba(232,236,240,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--concrete);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(-55deg,transparent,transparent 40px,rgba(245,166,35,0.018) 40px,rgba(245,166,35,0.018) 44px);pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;width:100%;max-width:700px;padding:0 24px 80px}
+.header{padding:40px 0 32px;border-bottom:2px solid var(--hi-vis);margin-bottom:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.logo-block{width:20px;height:20px;background:var(--hi-vis);transform:skewX(-8deg)}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--hi-vis)}
+.header h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:800;line-height:1.05;color:var(--text);letter-spacing:-0.01em;text-transform:uppercase;margin-bottom:8px}
+.header h1 span{color:var(--hi-vis)}
+.header p{font-size:14px;color:var(--text-muted);line-height:1.65;max-width:380px}
+.header-badge{flex-shrink:0;background:var(--hi-vis-dim);border:1px solid var(--hi-vis-border);border-radius:6px;padding:14px 18px;text-align:center}
+.hb-num{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--hi-vis);line-height:1}
+.hb-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;font-weight:600}
+.intro-card{background:var(--concrete-2);border:1px solid var(--border-2);border-radius:8px;padding:32px 28px;margin-bottom:24px;position:relative;overflow:hidden}
+.intro-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--hi-vis)}
+.intro-card h2{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:14px;color:var(--text)}
+.intro-card p{font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:12px}
+.intro-card p:last-of-type{margin-bottom:0}
+.snapshot-grid{background:var(--concrete-3);border:1px solid var(--border-2);border-radius:6px;padding:16px;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sg-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:600}
+.sg-value{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--hi-vis)}
+.intro-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.ipill{display:flex;align-items:center;gap:6px;background:var(--concrete-3);border:1px solid var(--border-2);border-radius:4px;padding:5px 11px;font-size:12px;color:var(--text-muted);font-weight:500}
+.ipill-dot{width:5px;height:5px;border-radius:1px;background:var(--hi-vis);transform:rotate(45deg)}
+.btn-start{background:var(--hi-vis);color:#111418;border:none;border-radius:6px;padding:15px 44px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;display:inline-block}
+.btn-start:hover{background:#ffc152;transform:translateY(-1px)}
+#chat-screen{display:none}
+.progress-wrap{margin-bottom:28px}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.prog-phase{font-size:11px;color:var(--hi-vis);font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
+.prog-track{height:3px;background:var(--concrete-4);border-radius:0}
+.prog-fill{height:100%;background:var(--hi-vis);border-radius:0;transition:width 0.6s ease;width:0%}
+.messages{display:flex;flex-direction:column;gap:16px;margin-bottom:22px;min-height:100px}
+.msg{display:flex;gap:12px;animation:msgIn 0.3s ease forwards;opacity:0}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{width:36px;height:36px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.06em;margin-top:2px;text-transform:uppercase}
+.msg-avatar.ai{background:var(--hi-vis-dim);border:1px solid var(--hi-vis-border);color:var(--hi-vis)}
+.msg-avatar.user{background:var(--concrete-3);border:1px solid var(--border-2);color:var(--text-muted);font-size:11px}
+.msg-bubble{flex:1;padding-top:3px}
+.msg-bubble .sender{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px}
+.msg-bubble.ai .sender{color:var(--hi-vis)}
+.msg-bubble .text{font-size:15px;line-height:1.7;color:var(--text)}
+.msg-bubble.user .text{color:var(--text-muted)}
+.section-divider{display:flex;align-items:center;gap:12px;margin:8px 0;animation:msgIn 0.3s ease forwards;opacity:0}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--hi-vis-border)}
+.section-divider span{font-size:10px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:var(--hi-vis);white-space:nowrap}
+.typing{display:flex;gap:12px;align-items:center}
+.typing-dots{display:flex;gap:5px;padding-top:6px}
+.typing-dots span{width:5px;height:5px;background:var(--hi-vis);border-radius:1px;animation:tdot 1.2s infinite;opacity:0.35;transform:rotate(45deg)}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:rotate(45deg) scale(1);opacity:0.35}30%{transform:rotate(45deg) scale(1.4);opacity:1}}
+.input-area{background:var(--concrete-2);border:1px solid var(--border-2);border-radius:8px;padding:14px;transition:border-color 0.2s}
+.input-area:focus-within{border-color:var(--hi-vis-border)}
+textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;font-weight:400;line-height:1.6;resize:none;min-height:56px;max-height:160px}
+textarea#user-input::placeholder{color:var(--text-dim)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--concrete-4)}
+.mic-hint{font-size:11px;color:var(--text-dim);font-weight:500}
+.btn-send{background:var(--hi-vis);color:#111418;border:none;border-radius:4px;padding:8px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.btn-send:hover{background:#ffc152}
+.btn-send:disabled{opacity:0.3;cursor:default}
+#complete-screen{display:none;text-align:center;padding:32px 0 0}
+.complete-mark{width:56px;height:56px;border-radius:6px;background:var(--hi-vis-dim);border:1px solid var(--hi-vis-border);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:20px}
+.complete-card{background:var(--concrete-2);border:1px solid var(--border-2);border-radius:8px;padding:26px;margin:24px 0;text-align:left;position:relative;overflow:hidden}
+.complete-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--hi-vis)}
+.complete-card h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;color:var(--hi-vis)}
+.answer-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--concrete-4)}
+.answer-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.answer-q{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:700}
+.answer-a{font-size:14px;color:var(--text-muted);line-height:1.65}
+.roi-summary{background:var(--concrete-3);border:1px solid var(--hi-vis-border);border-radius:6px;padding:20px;margin-top:18px}
+.roi-summary h4{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--hi-vis);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px}
+.roi-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--text-muted);margin-bottom:8px}
+.roi-row b{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--text);font-size:15px}
+.roi-total{border-top:1px solid var(--hi-vis-border);margin-top:10px;padding-top:12px;display:flex;justify-content:space-between;align-items:baseline;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--hi-vis);text-transform:uppercase;letter-spacing:0.04em}
+.btn-submit{background:var(--hi-vis);color:#111418;border:none;border-radius:6px;padding:15px 36px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-top:8px}
+.btn-submit:hover{background:#ffc152;transform:translateY(-1px)}
+.submit-note{font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.5}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--concrete-4);border-radius:2px}
+@media(max-width:480px){.page{padding:0 16px 60px}.header{flex-direction:column;padding:28px 0 24px}.intro-card{padding:22px 18px}.snapshot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-row"><div class="logo-block"></div><div class="logo-text">Business AI</div></div>
+      <h1>What's the <span>real cost</span><br>of not quoting?</h1>
+      <p>12 straight questions before Friday's Blueprint. We'll put a dollar figure on what you're leaving on the table — and what fixing it could unlock.</p>
+    </div>
+    <div class="header-badge"><div class="hb-num">12</div><div class="hb-label">Questions</div></div>
+  </div>
+
+  <div id="intro-screen">
+    <div class="intro-card">
+      <h2>G'day Rob — let's get straight into it.</h2>
+      <p>Before Friday's Blueprint session I need to understand the numbers behind your business — not the theory, the actual dollars. What you're turning over now, what contracts you're watching go past because you can't quote them yet, and what's eating your time day to day.</p>
+      <p>There are no wrong answers. Ballparks are fine. The more honest you are, the better Friday will be — and the clearer it'll be whether AI is the right move and what the return looks like for you.</p>
+      <p>Takes about 15 minutes. You can speak your answers using the mic on your phone keyboard.</p>
+      <div class="snapshot-grid">
+        <div class="sg-item"><div class="sg-label">Business</div><div class="sg-value">Maynz Construction</div></div>
+        <div class="sg-item"><div class="sg-label">Current revenue</div><div class="sg-value">~$3M projected</div></div>
+        <div class="sg-item"><div class="sg-label">Target contracts</div><div class="sg-value">$5M–$15M civil</div></div>
+        <div class="sg-item"><div class="sg-label">Blueprint session</div><div class="sg-value">Friday 28 March</div></div>
+      </div>
+      <div class="intro-pills">
+        <div class="ipill"><div class="ipill-dot"></div>~15 minutes</div>
+        <div class="ipill"><div class="ipill-dot"></div>Voice dictation works on mobile</div>
+        <div class="ipill"><div class="ipill-dot"></div>Goes straight to Tim</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="engineInit()">Let's go &rarr;</button>
+  </div>
+
+  <div id="chat-screen">
+    <div class="progress-wrap">
+      <div class="prog-meta">
+        <span class="prog-label" id="prog-label">Question 1 of 12</span>
+        <span class="prog-phase" id="prog-phase">The business now</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <textarea id="user-input" placeholder="Type your answer, or use your mic on mobile..." rows="3"></textarea>
+      <div class="input-footer">
+        <div class="mic-hint">🎙 Use your keyboard mic to speak</div>
+        <button class="btn-send" id="send-btn" onclick="sendAnswer()">Send &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="complete-screen">
+    <div class="complete-mark">&#10003;</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:10px;">Done, Rob.</h2>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:460px;margin:0 auto;">Tim's got your answers. He'll walk into Friday knowing exactly where the opportunities are for your business.</p>
+    <div class="complete-card">
+      <h3>Your answers</h3>
+      <div id="answers-summary"></div>
+      <div class="roi-summary" id="roi-summary" style="display:none">
+        <h4>ROI Snapshot</h4>
+        <div id="roi-rows"></div>
+        <div class="roi-total"><span>Annual opportunity</span><span id="roi-total-val">—</span></div>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitAnswers()">Send to Tim &rarr;</button>
+    <p class="submit-note">Your answers will be emailed to tim.ahern@businessai.com.au</p>
+  </div>
+
+</div>
+
+<script>
+// ─── Rob-specific CONFIG ──────────────────────────────────────────────────────
+
+const CONFIG = {
+  avatarAI: 'BAI',
+  avatarUser: 'RT',
+  senderAI: 'Business AI',
+  senderUser: 'Rob',
+  emailTo: 'tim.ahern@businessai.com.au',
+  emailSubject: 'Pre-Blueprint Prep — Rob Tuaati — Maynz Construction — Fri 28 March',
+  emailHeader: 'PRE-BLUEPRINT DISCOVERY — Rob Tuaati — Maynz Construction',
+
+  phases: {
+    0: 'The business now',
+    3: 'Contracts you can\'t win yet',
+    7: 'What winning looks like',
+    11: 'The bottom line'
+  },
+
+  systemPromptBase: `You are a sharp AI assistant running a pre-meeting ROI discovery for Business AI, an Australian AI automation company. You are talking to Rob Tuaati, owner of Maynz Construction in Perth, WA. Rob started in 2020, runs labour hire with ~25 guys, projecting $3M this year. He manually enters timesheets into Xero — a big time drain. His goal is to move into winning his own civil, infrastructure and mining contracts in the $5M-$15M range, but he can't fixed-price quote yet. He's meeting Tim from Business AI this Friday 28 March for a Blueprint session.`,
+
+  systemPromptRole: `The client has just answered a question. Your job:
+1. Acknowledge their answer in ONE short sentence — direct, no fluff. Match his energy — he's a straight-talking tradie turned business owner.
+2. Check whether the answer meets the QUESTION REQUIREMENT below.
+3. If YES — the answer has what's needed — acknowledge briefly and append [ADVANCE] at the very end of your reply. Example: "Perfect, that gives us what we need. [ADVANCE]"
+4. If NO — ask ONE short, specific follow-up question to get what's missing. Do NOT append [ADVANCE] until you have it.
+5. You may ask multiple follow-ups on the same question until the requirement is met. Every reply either ends with [ADVANCE] or contains a follow-up question. Never both.
+
+CRITICAL RULE — NEVER SUGGEST NUMBERS: When probing for a dollar figure, time estimate, or any other numerical value, you must NEVER suggest, imply, calculate, or reference a specific number yourself. Do not say things like "so that's roughly $X" or "at $150/hr that would be..." or "would you say around $Y?". Rob must generate every number himself from his own knowledge. Your job is to ask open questions that require him to produce the figure — not to anchor him to your guess. If he resists giving a number, ask again differently. Never put a number in his mouth.
+
+Tone: punchy plain English — footy coach at half time, not management consultant. No bullet points. No lists. Keep it tight. Never say "Great answer" or be sycophantic.`,
+
+  questions: [
+    {
+      section: 'The business now',
+      q: "You're projecting $3M this year — mostly labour hire. How many guys do you have on the books at the moment, and how steady is that work?",
+      key: 'current_business',
+      label: 'Current business size and revenue mix'
+    },
+    {
+      q: "The timesheet situation — your guys email them in and you're manually entering everything into Xero. How many hours a week does that actually take you, and does it create errors or re-work on top of that?",
+      key: 'timesheet_pain',
+      label: 'Timesheet hours and error cost per week'
+    },
+    {
+      q: "Put a dollar figure on that for me. Whether it's your time, errors, or late corrections — what's it actually costing the business per month in real dollars?",
+      key: 'timesheet_cost',
+      label: 'Monthly dollar cost of manual timesheets'
+    },
+    {
+      section: "Contracts you can't win yet",
+      q: "In the last six months, how many civil, infrastructure or mining contracts have you seen or been approached about that you couldn't bid on because you didn't have the quoting capability?",
+      key: 'missed_contracts_count',
+      label: 'Contracts seen but unable to bid on'
+    },
+    {
+      q: "What's the dollar value of those jobs? Give me a typical one and the biggest one you had to pass on.",
+      key: 'missed_contracts_value',
+      label: 'Dollar value of contracts passed on'
+    },
+    {
+      q: "You've been pricing on day rates — labour plus supervision. In the last 12 months, how much have you turned over that way — and what do you think you left behind by not being able to quote fixed price?",
+      key: 'day_rate_vs_fixed',
+      label: 'Day rate revenue vs fixed price upside'
+    },
+    {
+      q: "When you do win a contract, what does a typical job look like in dollar terms — and what's your rough margin after wages, materials, and subbies?",
+      key: 'job_value_margin',
+      label: 'Average contract value and net margin'
+    },
+    {
+      section: 'What winning looks like',
+      q: "If you had an AI that could read a set of plans and spit out an accurate estimate — what's the first contract you'd go after? What sector, what kind of job, roughly what value?",
+      key: 'first_target_contract',
+      label: 'First target contract type and value'
+    },
+    {
+      q: "Realistically, if you won just two or three $5M+ contracts in the next 12 months — what does that do to your revenue, and what does it change for you personally?",
+      key: 'win_scenario_impact',
+      label: 'Revenue and personal impact of winning 2-3 major contracts'
+    },
+    {
+      q: "You said yourself you're winging it on systems — how many hours a week are you spending on stuff that should be automated or delegated? Timesheets, admin, chasing paperwork, all of it.",
+      key: 'admin_time_weekly',
+      label: 'Weekly hours lost to admin and manual processes'
+    },
+    {
+      q: "If those hours were freed up — what would you actually do with them? More time winning work, building relationships, setting up Queensland, something else?",
+      key: 'freed_time_use',
+      label: 'Highest value use of freed-up owner time'
+    },
+    {
+      section: 'The bottom line',
+      q: "Last one. If an AI handled 80% of your estimating and automated your timesheet-to-payroll process — and it cost you a few thousand a month — what would it need to deliver back into the business for it to be an absolute no-brainer?",
+      key: 'roi_threshold',
+      label: 'ROI threshold for a clear yes decision'
+    }
+  ],
+
+  // Gatekeeper requirements — what the AI must verify before appending [ADVANCE]
+  // Keyed by question index + 1 (1-based) to match display numbering
+  requirements: {
+    1: `REQUIREMENT: Rob must have given both (a) a headcount number and (b) some sense of how consistent the work is. If either is missing, ask for it. Once both are present, append [ADVANCE].`,
+
+    2: `REQUIREMENT: Rob must have given (a) a specific number of hours per week AND (b) mentioned whether errors or re-work add extra time. If the hours are vague ("a couple") push for a specific number. If he hasn't addressed errors, ask. Once both are present, append [ADVANCE].`,
+
+    3: `CRITICAL ROI FIELD — dollar figure required. Rob must state a specific dollar amount for the monthly cost of this process.
+    - If he gives a dollar figure (e.g. "$500 a month", "about 2K"), append [ADVANCE].
+    - If he only gives hours with no dollar value, ask him to put a dollar figure on it himself — e.g. "What's your time worth per hour — and what does that add up to across those hours each month?" or "Put a dollar figure on it — what do you reckon that's actually costing you per month?" NEVER suggest or calculate a number for him.
+    - If he resists or deflects, ask again differently until he produces a number.
+    - Do NOT append [ADVANCE] until Rob has stated a dollar figure himself.`,
+
+    4: `REQUIREMENT: Rob must give a specific count of contracts he couldn't bid on. If he's vague ("a handful", "a few"), push for a number. Once there's a count, append [ADVANCE].`,
+
+    5: `CRITICAL ROI FIELD — dollar figures required. Rob must state a dollar value for (a) a typical missed contract AND (b) the biggest one he passed on.
+    - If he gives both, append [ADVANCE].
+    - If he only gives one, ask for the other specifically.
+    - Do NOT append [ADVANCE] until both figures are stated.`,
+
+    6: `REQUIREMENT: Rob must give some sense of the gap between what he's been winning on day rates vs what fixed-price quoting could have added. A rough dollar estimate or a "I could have won X more jobs worth $Y each" is sufficient. If he's completely vague, ask: "Ballpark — what do you think you left on the table in dollar terms?" Append [ADVANCE] once there's any dollar estimate.`,
+
+    7: `CRITICAL ROI FIELD — both values required. Rob must state (a) average contract value in dollars AND (b) approximate net margin (% or dollar amount per job).
+    - If both are present, append [ADVANCE].
+    - If either is missing, ask for it specifically.
+    - Do NOT append [ADVANCE] until both are stated.`,
+
+    8: `REQUIREMENT: Rob must name (a) a specific sector or job type AND (b) an approximate dollar value for that target contract. If either is missing, ask for it. Append [ADVANCE] once both are present.`,
+
+    9: `CRITICAL ROI FIELD — dollar figure required. Rob must state a specific dollar amount for what winning 2-3 major contracts would add to revenue in the next 12 months.
+    - If he gives a figure (e.g. "$15 million", "about 9 mil"), append [ADVANCE].
+    - If he speaks only in vague terms, ask: "What would that add up to in dollar terms over the next 12 months?"
+    - Do NOT append [ADVANCE] until a dollar figure is stated.`,
+
+    10: `REQUIREMENT: Rob must give a specific number of hours per week lost to admin. If he says "a couple of days" convert that — ask "So that's roughly 15-16 hours, does that sound right?" and confirm. Append [ADVANCE] once a specific hour count is agreed.`,
+
+    11: `REQUIREMENT: Rob must describe at least one specific high-value activity he'd focus on with freed time. A general answer like "winning more work" is sufficient — doesn't need to be highly detailed. Append [ADVANCE] once there's a specific answer.`,
+
+    12: `CRITICAL ROI FIELD — both values required. Rob must state (a) what he thinks it would cost per month AND (b) what return it would need to generate for it to be a clear yes.
+    - If both are present, append [ADVANCE].
+    - If he only states one, ask for the other.
+    - Do NOT append [ADVANCE] until both figures are present.`
+  }
+};
+
+// ─── Rob-specific ROI Calculator ─────────────────────────────────────────────
+
+function calcROI() {
+  const rows = [];
+  let total = 0;
+
+  // 1. Timesheet cost — monthly × 12
+  // Only use dollar figures that Rob stated himself — never calculate from assumed rates
+  const tsText = answers['timesheet_cost'] || '';
+  let tsCost = extractLargestDollar(tsText);
+  if (tsCost > 0) {
+    // Was given as monthly — annualise
+    tsCost = tsCost * 12;
+  }
+  // Note: if Rob only gave hours and no dollar figure, the gatekeeper should have
+  // probed until he gave one. If we still have nothing, we leave this field blank
+  // rather than guessing — a blank is more honest than a fabricated number.
+  if (tsCost > 0) {
+    rows.push({ label: 'Manual timesheet & payroll cost (annualised)', val: tsCost });
+    total += tsCost;
+  }
+
+  // 2. Missed contracts — use Rob's own estimate if available, else conservative calc
+  // Conservative: largest contract value × win rate (33%) × count passed on
+  const missedVal = extractLargestDollar(answers['missed_contracts_value'] || '');
+  const missedCount = parseInt((answers['missed_contracts_count'] || '').match(/\d+/) || [2]) || 2;
+  if (missedVal > 0) {
+    // One year of missed bidding: count × value × 33% win rate
+    const missedRevenue = Math.round(missedVal * Math.min(missedCount, 6) * 0.33);
+    if (missedRevenue > 0) {
+      rows.push({ label: 'Missed contract revenue (33% win rate on ' + Math.min(missedCount, 6) + ' bids)', val: missedRevenue });
+      total += missedRevenue;
+    }
+  }
+
+  // 3. Rob's own 12-month win scenario — most credible number, use directly
+  const winVal = extractLargestDollar(answers['win_scenario_impact'] || '');
+  if (winVal > 0) {
+    rows.push({ label: 'Revenue from 2-3 major contracts (Rob\'s estimate)', val: winVal });
+    total += winVal;
+  }
+
+  return { rows, total };
+}
+</script>
+
+<!-- Shared engine — loaded after CONFIG and calcROI are defined -->
+<script src="interview-engine.js"></script>
+
+</body>
+</html>
