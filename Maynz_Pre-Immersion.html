@@ -359,7 +359,347 @@ function calcROI() {
 </script>
 
 <!-- Shared engine — loaded after CONFIG and calcROI are defined -->
-<script src="interview-engine.js"></script>
+<script>
+/**
+ * Business AI — Interview Engine v2
+ * 
+ * Shared conversation engine for all client pre-meeting interview forms.
+ * Import this file into each client HTML. Define QUESTIONS and CONFIG in the HTML.
+ * 
+ * Key design: [ADVANCE] gatekeeper model — AI only advances when it has what it needs.
+ * See INTERVIEW_ENGINE_NOTES.md for full design decisions and lessons learned.
+ */
+
+// ─── State ───────────────────────────────────────────────────────────────────
+
+let currentQ = 0;
+let answers = {};
+let conversationHistory = [];
+let isWaiting = false;
+let isProbing = false; // true when AI is mid follow-up sequence on same question
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
+function engineInit() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'block';
+  askQuestion(0);
+  document.getElementById('user-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendAnswer();
+    }
+  });
+}
+
+// ─── Progress ─────────────────────────────────────────────────────────────────
+
+function updateProgress() {
+  const pct = Math.round((currentQ / CONFIG.questions.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent =
+    'Question ' + (Math.min(currentQ + 1, CONFIG.questions.length)) + ' of ' + CONFIG.questions.length;
+
+  // Phase label — find highest phase threshold <= currentQ
+  let phase = '';
+  const phaseKeys = Object.keys(CONFIG.phases).map(Number).sort((a, b) => a - b);
+  for (const k of phaseKeys) {
+    if (currentQ >= k) phase = CONFIG.phases[k];
+  }
+  document.getElementById('prog-phase').textContent = phase;
+}
+
+// ─── Messaging ────────────────────────────────────────────────────────────────
+
+function addMessage(role, text) {
+  const msgs = document.getElementById('messages');
+
+  if (role === 'section') {
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    div.style.animationDelay = '0.05s';
+    div.innerHTML = '<span>' + text + '</span>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.style.animationDelay = '0.05s';
+  const isAI = role === 'ai';
+
+  div.innerHTML =
+    '<div class="msg-avatar ' + (isAI ? 'ai' : 'user') + '">' +
+      (isAI ? CONFIG.avatarAI : CONFIG.avatarUser) +
+    '</div>' +
+    '<div class="msg-bubble ' + (isAI ? 'ai' : 'user') + '">' +
+      '<div class="sender">' + (isAI ? CONFIG.senderAI : CONFIG.senderUser) + '</div>' +
+      '<div class="text">' + text.replace(/\n/g, '<br>') + '</div>' +
+    '</div>';
+
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typing-indicator';
+  div.innerHTML =
+    '<div class="msg-avatar ai">' + CONFIG.avatarAI + '</div>' +
+    '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+// ─── Question Flow ────────────────────────────────────────────────────────────
+
+function askQuestion(index) {
+  updateProgress();
+  const q = CONFIG.questions[index];
+
+  if (q.section) {
+    setTimeout(() => {
+      addMessage('section', q.section);
+      setTimeout(() => {
+        addMessage('ai', q.q);
+        enableInput();
+      }, 350);
+    }, 200);
+  } else {
+    setTimeout(() => {
+      addMessage('ai', q.q);
+      enableInput();
+    }, 300);
+  }
+}
+
+function enableInput() {
+  document.getElementById('user-input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('user-input').focus();
+  isWaiting = false;
+}
+
+function disableInput() {
+  document.getElementById('user-input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+  isWaiting = true;
+}
+
+// ─── Send & Gatekeeper Logic ──────────────────────────────────────────────────
+
+async function sendAnswer() {
+  if (isWaiting) return;
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  disableInput();
+  addMessage('user', text);
+  input.value = '';
+
+  const q = CONFIG.questions[currentQ];
+
+  // Append to existing answer if we're in a follow-up probe
+  if (isProbing) {
+    answers[q.key] = (answers[q.key] || '') + ' | ' + text;
+  } else {
+    answers[q.key] = text;
+  }
+
+  conversationHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  // Build requirement block for this question
+  const requirement = CONFIG.requirements[currentQ + 1]
+    ? '\n\nQUESTION REQUIREMENT:\n' + CONFIG.requirements[currentQ + 1]
+    : '\n\nQUESTION REQUIREMENT:\nIf the answer addresses the question with reasonable clarity, append [ADVANCE]. If it is vague or missing important context, ask one focused follow-up.';
+
+  const systemPrompt = CONFIG.systemPromptBase +
+    '\n\nYou are on question ' + (currentQ + 1) + ' of ' + CONFIG.questions.length +
+    '. The question was: "' + q.q + '"' +
+    '\n\n' + CONFIG.systemPromptRole +
+    requirement;
+
+  // Fetch with timeout — prevents hang in sandboxed environments (e.g. preview iframes)
+  const fetchWithTimeout = (url, opts, ms) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
+  };
+
+  try {
+    const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: systemPrompt,
+        messages: conversationHistory
+      })
+    }, 8000);
+
+    const data = await response.json();
+    removeTyping();
+
+    let aiReply = (data.content && data.content[0]) ? data.content[0].text : '';
+    const shouldAdvance = aiReply.includes('[ADVANCE]');
+
+    // Strip the token before showing to user
+    aiReply = aiReply.replace('[ADVANCE]', '').trim();
+
+    if (!aiReply) aiReply = shouldAdvance ? 'Got it.' : 'Can you give me a bit more detail on that?';
+
+    conversationHistory.push({ role: 'assistant', content: aiReply });
+    addMessage('ai', aiReply);
+
+    if (shouldAdvance) {
+      // AI is satisfied — advance to next question
+      isProbing = false;
+      currentQ++;
+      if (currentQ < CONFIG.questions.length) {
+        setTimeout(() => askQuestion(currentQ), 700);
+      } else {
+        setTimeout(() => showComplete(), 900);
+      }
+    } else {
+      // AI wants more — stay on this question
+      isProbing = true;
+      enableInput();
+    }
+
+  } catch (err) {
+    // Timeout or network error — advance gracefully
+    removeTyping();
+    isProbing = false;
+    currentQ++;
+    if (currentQ < CONFIG.questions.length) {
+      setTimeout(() => askQuestion(currentQ), 700);
+    } else {
+      setTimeout(() => showComplete(), 900);
+    }
+  }
+}
+
+// ─── ROI Calculator ───────────────────────────────────────────────────────────
+
+/**
+ * Extract the largest dollar-like value from a text string.
+ * Handles: $40,000 / 40K / 5 million / $5M / 5m etc.
+ * Minimum $1,000 to filter out percentages and small counts.
+ */
+function extractLargestDollar(text) {
+  if (!text) return 0;
+  const matches = [...text.matchAll(/\$?([\d,]+(?:\.\d+)?)\s*(million|m\b|k\b)?/gi)];
+  let best = 0;
+  for (const m of matches) {
+    let val = parseFloat(m[1].replace(/,/g, ''));
+    const sfx = (m[2] || '').toLowerCase();
+    if (sfx === 'million' || sfx === 'm') val *= 1000000;
+    else if (sfx === 'k') val *= 1000;
+    if (val >= 1000 && val > best) best = val;
+  }
+  return best;
+}
+
+/**
+ * Extract the largest number of hours from a text string.
+ */
+function extractHours(text) {
+  if (!text) return 0;
+  const matches = [...text.matchAll(/(\d+(?:\.\d+)?)\s*(hours?|hrs?|h\b)/gi)];
+  let best = 0;
+  for (const m of matches) {
+    const val = parseFloat(m[1]);
+    if (val > best) best = val;
+  }
+  return best;
+}
+
+/**
+ * Format a dollar value for display.
+ */
+function fmt(n) {
+  if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return '$' + Math.round(n / 1000) + 'K';
+  return '$' + Math.round(n).toLocaleString();
+}
+
+// ─── Complete Screen ──────────────────────────────────────────────────────────
+
+function showComplete() {
+  document.getElementById('chat-screen').style.display = 'none';
+  document.getElementById('complete-screen').style.display = 'block';
+  window.scrollTo(0, 0);
+
+  // Build answers summary
+  const summaryEl = document.getElementById('answers-summary');
+  summaryEl.innerHTML = '';
+  CONFIG.questions.forEach(q => {
+    if (answers[q.key]) {
+      const div = document.createElement('div');
+      div.className = 'answer-item';
+      div.innerHTML =
+        '<div class="answer-q">' + q.label + '</div>' +
+        '<div class="answer-a">' + answers[q.key] + '</div>';
+      summaryEl.appendChild(div);
+    }
+  });
+
+  // ROI snapshot — calculated by client-specific calcROI() function
+  if (typeof calcROI === 'function') {
+    const { rows, total } = calcROI();
+    if (rows.length > 0 && total > 0) {
+      document.getElementById('roi-summary').style.display = 'block';
+      document.getElementById('roi-rows').innerHTML = rows
+        .map(r => '<div class="roi-row"><span>' + r.label + '</span><b>' + fmt(r.val) + '</b></div>')
+        .join('');
+      document.getElementById('roi-total-val').textContent = fmt(total) + '/yr';
+    }
+  }
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+
+function submitAnswers() {
+  const btn = document.querySelector('.btn-submit');
+  let body = CONFIG.emailHeader + '\n' + '='.repeat(52) + '\n\n';
+
+  // ROI snapshot at top of email
+  if (typeof calcROI === 'function') {
+    const { rows, total } = calcROI();
+    if (total > 0) {
+      body += '--- ROI SNAPSHOT ---\n';
+      rows.forEach(r => { body += r.label + ': ' + fmt(r.val) + '\n'; });
+      body += 'TOTAL: ' + fmt(total) + '/yr\n\n';
+    }
+  }
+
+  // All answers
+  CONFIG.questions.forEach(q => {
+    if (q.section) body += '\n--- ' + q.section.toUpperCase() + ' ---\n\n';
+    if (answers[q.key]) body += 'Q: ' + q.label + '\nA: ' + answers[q.key] + '\n\n';
+  });
+
+  const subject = encodeURIComponent(CONFIG.emailSubject);
+  window.location.href = 'mailto:' + CONFIG.emailTo + '?subject=' + subject + '&body=' + encodeURIComponent(body);
+
+  btn.textContent = 'Email app opening...';
+  btn.disabled = true;
+  document.querySelector('.submit-note').textContent =
+    'Your email app will open with everything pre-filled. Just hit send.';
+}
+
+</script>
 
 </body>
 </html>
