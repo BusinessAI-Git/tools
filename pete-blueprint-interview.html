@@ -924,28 +924,45 @@ function showComplete() {
 }
 
 function submitAnswers() {
-  const btn = document.querySelector('.btn-submit');
+  var btn = document.querySelector('.btn-submit');
+  var note = document.querySelector('.submit-note');
 
-  // Format answers for email
-  let emailBody = "BLUEPRINT PRE-WORK — Eureka Stockade Holiday Park\n";
-  emailBody += "=".repeat(50) + "\n\n";
-
-  QUESTIONS.forEach(q => {
-    if (q.section) emailBody += `\n--- ${q.section.toUpperCase()} ---\n\n`;
-    if (answers[q.key]) {
-      emailBody += `Q: ${q.label}\nA: ${answers[q.key]}\n\n`;
-    }
+  var emailBody = 'BLUEPRINT PRE-WORK - Eureka Stockade Holiday Park\n' + '='.repeat(50) + '\n\n';
+  QUESTIONS.forEach(function(q) {
+    if (q.section) emailBody += '\n--- ' + q.section.toUpperCase() + ' ---\n\n';
+    if (answers[q.key]) emailBody += 'Q: ' + q.label + '\nA: ' + answers[q.key] + '\n\n';
   });
+  var body = emailBody;
 
-  const subject = encodeURIComponent('Blueprint Pre-Work — Pete McKenzie — Eureka Stockade Holiday Park');
-  const body = encodeURIComponent(emailBody);
-  const mailtoLink = `mailto:tim.ahern@businessai.com.au?subject=${subject}&body=${body}`;
-
-  window.location.href = mailtoLink;
-
-  btn.textContent = '✓ Email app opening...';
+  btn.textContent = 'Sending...';
   btn.disabled = true;
-  document.querySelector('.submit-note').textContent = "Your email app should open with everything pre-filled. Just hit send — Tim will have your answers before Friday.";
+
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      access_key: 'be8e618e-19e3-4b81-abf3-eb903e6d11ad',
+      subject: 'Blueprint Pre-Work - Pete McKenzie - Eureka Stockade Holiday Park',
+      from_name: 'Business AI Interview Forms',
+      message: body
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      btn.textContent = 'Sent to Tim';
+      if (note) note.textContent = 'Your answers have been sent. Tim will review everything before Friday.';
+    } else {
+      btn.textContent = 'Confirm & send to Tim';
+      btn.disabled = false;
+      if (note) note.textContent = 'Something went wrong - please try again.';
+    }
+  })
+  .catch(function() {
+    btn.textContent = 'Confirm & send to Tim';
+    btn.disabled = false;
+    if (note) note.textContent = 'Something went wrong - please try again.';
+  });
 }
 </script>
 </body>

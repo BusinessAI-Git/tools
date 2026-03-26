@@ -105,9 +105,9 @@ textarea#user-input::placeholder{color:var(--text-dim)}
     <div class="header-left">
       <div class="logo-row"><div class="logo-block"></div><div class="logo-text">Business AI</div></div>
       <h1>What's the <span>real cost</span><br>of not quoting?</h1>
-      <p>12 straight questions before Friday's Blueprint. We'll put a dollar figure on what you're leaving on the table — and what fixing it could unlock.</p>
+      <p>14 straight questions before Friday's Blueprint. We'll put a dollar figure on what you're leaving on the table — and what fixing it could unlock.</p>
     </div>
-    <div class="header-badge"><div class="hb-num">12</div><div class="hb-label">Questions</div></div>
+    <div class="header-badge"><div class="hb-num">14</div><div class="hb-label">Questions</div></div>
   </div>
 
   <div id="intro-screen">
@@ -134,7 +134,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
   <div id="chat-screen">
     <div class="progress-wrap">
       <div class="prog-meta">
-        <span class="prog-label" id="prog-label">Question 1 of 12</span>
+        <span class="prog-label" id="prog-label">Question 1 of 14</span>
         <span class="prog-phase" id="prog-phase">The business now</span>
       </div>
       <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
@@ -159,7 +159,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
       <div class="roi-summary" id="roi-summary" style="display:none">
         <h4>ROI Snapshot</h4>
         <div id="roi-rows"></div>
-        <div class="roi-total"><span>Annual opportunity</span><span id="roi-total-val">—</span></div>
+        <div class="roi-total"><span>Annual cost of status quo</span><span id="roi-total-val">—</span></div>
       </div>
     </div>
     <button class="btn-submit" onclick="submitAnswers()">Send to Tim &rarr;</button>
@@ -182,9 +182,9 @@ const CONFIG = {
 
   phases: {
     0: 'The business now',
-    3: 'Contracts you can\'t win yet',
-    7: 'What winning looks like',
-    11: 'The bottom line'
+    5: 'Contracts you can\'t win yet',
+    9: 'What winning looks like',
+    13: 'The bottom line'
   },
 
   systemPromptBase: `You are a sharp AI assistant running a pre-meeting ROI discovery for Business AI, an Australian AI automation company. You are talking to Rob Tuaati, owner of Maynz Construction in Perth, WA. Rob started in 2020, runs labour hire with ~25 guys, projecting $3M this year. He manually enters timesheets into Xero — a big time drain. His goal is to move into winning his own civil, infrastructure and mining contracts in the $5M-$15M range, but he can't fixed-price quote yet. He's meeting Tim from Business AI this Friday 28 March for a Blueprint session.`,
@@ -213,9 +213,19 @@ Tone: punchy plain English — footy coach at half time, not management consulta
       label: 'Timesheet hours and error cost per week'
     },
     {
-      q: "Put a dollar figure on that for me. Whether it's your time, errors, or late corrections — what's it actually costing the business per month in real dollars?",
-      key: 'timesheet_cost',
-      label: 'Monthly dollar cost of manual timesheets'
+      q: "Here's a different way to think about it. You're the decision-maker — the person who determines whether Maynz does $1M this year or $5M. If you had a full day focused on the right calls, the right relationships, winning the right work — what would a day like that be worth to the business in dollar terms?",
+      key: 'ceo_day_value',
+      label: 'CEO day value to the business'
+    },
+    {
+      q: "Now flip it. How many hours a week are you stuck doing operator-level work — timesheets, admin, fixing errors, chasing paperwork — instead of that CEO work?",
+      key: 'operator_hours',
+      label: 'Hours per week lost to operator-level work'
+    },
+    {
+      q: "So if a full CEO day is worth what you just said — and you're spending those hours doing admin instead — what's that costing the business each week in lost value? Work it out yourself and give me the number.",
+      key: 'ceo_opportunity_cost',
+      label: 'Weekly cost of CEO doing operator work'
     },
     {
       section: "Contracts you can't win yet",
@@ -234,9 +244,9 @@ Tone: punchy plain English — footy coach at half time, not management consulta
       label: 'Day rate revenue vs fixed price upside'
     },
     {
-      q: "When you do win a contract, what does a typical job look like in dollar terms — and what's your rough margin after wages, materials, and subbies?",
+      q: "For the civil and fixed-price work you're targeting — the $5M to $15M jobs — what margin do you expect to make on those after wages, materials, and subbies? Give me a percentage or a dollar figure per job.",
       key: 'job_value_margin',
-      label: 'Average contract value and net margin'
+      label: 'Target contract margin on civil and fixed-price work'
     },
     {
       section: 'What winning looks like',
@@ -274,38 +284,50 @@ Tone: punchy plain English — footy coach at half time, not management consulta
 
     2: `REQUIREMENT: Rob must have given (a) a specific number of hours per week AND (b) mentioned whether errors or re-work add extra time. If the hours are vague ("a couple") push for a specific number. If he hasn't addressed errors, ask. Once both are present, append [ADVANCE].`,
 
-    3: `CRITICAL ROI FIELD — dollar figure required. Rob must state a specific dollar amount for the monthly cost of this process.
-    - If he gives a dollar figure (e.g. "$500 a month", "about 2K"), append [ADVANCE].
-    - If he only gives hours with no dollar value, ask him to put a dollar figure on it himself — e.g. "What's your time worth per hour — and what does that add up to across those hours each month?" or "Put a dollar figure on it — what do you reckon that's actually costing you per month?" NEVER suggest or calculate a number for him.
-    - If he resists or deflects, ask again differently until he produces a number.
-    - Do NOT append [ADVANCE] until Rob has stated a dollar figure himself.`,
+    3: `CRITICAL ROI FIELD. This question asks Rob what a full productive CEO day is worth to the business — not his salary or hourly rate, but the business value of a day where he's making decisions, building relationships, winning work.
+    - If Rob gives a vague answer like "a lot" or "hard to say", push him: "Give me a number — what does a good day of CEO work move the needle by for the business?"
+    - If he anchors to his salary or hourly rate, redirect: "I'm not asking what you pay yourself — I'm asking what a day of your best work is worth to the business in terms of what it could generate."
+    - NEVER suggest a number. He must produce it himself.
+    - Do NOT append [ADVANCE] until Rob has stated a specific dollar figure for his CEO day value.`,
 
-    4: `REQUIREMENT: Rob must give a specific count of contracts he couldn't bid on. If he's vague ("a handful", "a few"), push for a number. Once there's a count, append [ADVANCE].`,
+    6: `REQUIREMENT. This question asks how many hours per week Rob spends on operator-level work — admin, timesheets, fixing errors, chasing paperwork — instead of CEO-level work.
+    - Rob must give a specific number of hours. If he says "a bit" or "not much", push for a number: "Give me your best estimate — how many hours a week would you say?"
+    - If he says "a day" or "two days" treat that as 8 or 16 hours respectively and confirm: "So roughly X hours — does that sound right?"
+    - Do NOT append [ADVANCE] until a specific hour count is confirmed.`,
 
-    5: `CRITICAL ROI FIELD — dollar figures required. Rob must state a dollar value for (a) a typical missed contract AND (b) the biggest one he passed on.
+    7: `CRITICAL ROI FIELD. This question asks Rob to calculate the weekly cost himself — CEO day value divided across hours, times the operator hours he just gave.
+    - Rob must produce a dollar figure himself. Do NOT calculate it for him or suggest a number.
+    - If he hesitates, prompt him: "Take the day value you just gave me and the hours you said — what does that work out to per week?"
+    - If he gets confused, simplify: "What's your CEO day value divided by 8 hours, times the hours you're spending on admin?"
+    - Do NOT append [ADVANCE] until Rob has stated a specific weekly dollar figure.`,
+
+    6: `REQUIREMENT: Rob must give a specific count of contracts he couldn't bid on. If he's vague ("a handful", "a few"), push for a number. Once there's a count, append [ADVANCE].`,
+
+    7: `CRITICAL ROI FIELD — dollar figures required. Rob must state a dollar value for (a) a typical missed contract AND (b) the biggest one he passed on.
     - If he gives both, append [ADVANCE].
     - If he only gives one, ask for the other specifically.
     - Do NOT append [ADVANCE] until both figures are stated.`,
 
-    6: `REQUIREMENT: Rob must give some sense of the gap between what he's been winning on day rates vs what fixed-price quoting could have added. A rough dollar estimate or a "I could have won X more jobs worth $Y each" is sufficient. If he's completely vague, ask: "Ballpark — what do you think you left on the table in dollar terms?" Append [ADVANCE] once there's any dollar estimate.`,
+    8: `REQUIREMENT: Rob must give some sense of the gap between what he's been winning on day rates vs what fixed-price quoting could have added. A rough dollar estimate or a "I could have won X more jobs worth $Y each" is sufficient. If he's completely vague, ask: "Ballpark — what do you think you left on the table in dollar terms?" Append [ADVANCE] once there's any dollar estimate.`,
 
-    7: `CRITICAL ROI FIELD — both values required. Rob must state (a) average contract value in dollars AND (b) approximate net margin (% or dollar amount per job).
-    - If both are present, append [ADVANCE].
-    - If either is missing, ask for it specifically.
-    - Do NOT append [ADVANCE] until both are stated.`,
+    9: `CRITICAL ROI FIELD — margin on civil/fixed-price work required. The question specifically asks about the $5M-$15M civil and fixed-price contracts Rob is targeting — NOT his labour hire work.
+    - If Rob answers about labour hire or asks which type of contract, redirect clearly: "I'm asking about the civil and fixed-price jobs you're going after — the big ones. What margin do you expect on those?"
+    - Rob must state a margin — either as a percentage (e.g. 10%) or a dollar figure per job (e.g. $500K per job).
+    - If Rob's answer is a question back to you, that is NOT an answer. Clarify and probe again. Do NOT advance on a question.
+    - Do NOT append [ADVANCE] until Rob has stated a margin specifically for the civil/fixed-price work.`,
 
-    8: `REQUIREMENT: Rob must name (a) a specific sector or job type AND (b) an approximate dollar value for that target contract. If either is missing, ask for it. Append [ADVANCE] once both are present.`,
+    10: `REQUIREMENT: Rob must name (a) a specific sector or job type AND (b) an approximate dollar value for that target contract. If either is missing, ask for it. Append [ADVANCE] once both are present.`,
 
-    9: `CRITICAL ROI FIELD — dollar figure required. Rob must state a specific dollar amount for what winning 2-3 major contracts would add to revenue in the next 12 months.
+    11: `CRITICAL ROI FIELD — dollar figure required. Rob must state a specific dollar amount for what winning 2-3 major contracts would add to revenue in the next 12 months.
     - If he gives a figure (e.g. "$15 million", "about 9 mil"), append [ADVANCE].
     - If he speaks only in vague terms, ask: "What would that add up to in dollar terms over the next 12 months?"
     - Do NOT append [ADVANCE] until a dollar figure is stated.`,
 
-    10: `REQUIREMENT: Rob must give a specific number of hours per week lost to admin. If he says "a couple of days" convert that — ask "So that's roughly 15-16 hours, does that sound right?" and confirm. Append [ADVANCE] once a specific hour count is agreed.`,
+    12: `REQUIREMENT: Rob must give a specific number of hours per week lost to admin. If he says "a couple of days" convert that — ask "So that's roughly 15-16 hours, does that sound right?" and confirm. Append [ADVANCE] once a specific hour count is agreed.`,
 
-    11: `REQUIREMENT: Rob must describe at least one specific high-value activity he'd focus on with freed time. A general answer like "winning more work" is sufficient — doesn't need to be highly detailed. Append [ADVANCE] once there's a specific answer.`,
+    13: `REQUIREMENT: Rob must describe at least one specific high-value activity he'd focus on with freed time. A general answer like "winning more work" is sufficient — doesn't need to be highly detailed. Append [ADVANCE] once there's a specific answer.`,
 
-    12: `CRITICAL ROI FIELD — both values required. Rob must state (a) what he thinks it would cost per month AND (b) what return it would need to generate for it to be a clear yes.
+    14: `CRITICAL ROI FIELD — both values required. Rob must state (a) what he thinks it would cost per month AND (b) what return it would need to generate for it to be a clear yes.
     - If both are present, append [ADVANCE].
     - If he only states one, ask for the other.
     - Do NOT append [ADVANCE] until both figures are present.`
@@ -318,44 +340,103 @@ function calcROI() {
   const rows = [];
   let total = 0;
 
-  // 1. Timesheet cost — monthly × 12
-  // Only use dollar figures that Rob stated himself — never calculate from assumed rates
-  const tsText = answers['timesheet_cost'] || '';
-  let tsCost = extractLargestDollar(tsText);
-  if (tsCost > 0) {
-    // Was given as monthly — annualise
-    tsCost = tsCost * 12;
-  }
-  // Note: if Rob only gave hours and no dollar figure, the gatekeeper should have
-  // probed until he gave one. If we still have nothing, we leave this field blank
-  // rather than guessing — a blank is more honest than a fabricated number.
-  if (tsCost > 0) {
-    rows.push({ label: 'Manual timesheet & payroll cost (annualised)', val: tsCost });
-    total += tsCost;
-  }
+  // ── Bucket 1: CEO opportunity cost ───────────────────────────────────────
+  // Rob stated his CEO day value and his weekly operator hours separately.
+  // He then calculated the weekly cost himself in Q5 (ceo_opportunity_cost).
+  // We use his own weekly figure directly — most credible since he produced it.
+  // Fallback: derive from day value + hours if he gave those but Q5 is unclear.
 
-  // 2. Missed contracts — use Rob's own estimate if available, else conservative calc
-  // Conservative: largest contract value × win rate (33%) × count passed on
-  const missedVal = extractLargestDollar(answers['missed_contracts_value'] || '');
-  const missedCount = parseInt((answers['missed_contracts_count'] || '').match(/\d+/) || [2]) || 2;
-  if (missedVal > 0) {
-    // One year of missed bidding: count × value × 33% win rate
-    const missedRevenue = Math.round(missedVal * Math.min(missedCount, 6) * 0.33);
-    if (missedRevenue > 0) {
-      rows.push({ label: 'Missed contract revenue (33% win rate on ' + Math.min(missedCount, 6) + ' bids)', val: missedRevenue });
-      total += missedRevenue;
+  const ceoWeeklyText = answers['ceo_opportunity_cost'] || '';
+  const ceoDayText = answers['ceo_day_value'] || '';
+  const operatorHoursText = answers['operator_hours'] || '';
+
+  let ceoWeeklyCost = extractLargestDollar(ceoWeeklyText);
+
+  if (ceoWeeklyCost === 0) {
+    // Fallback: day value ÷ 8 × operator hours per week
+    const dayVal = extractLargestDollar(ceoDayText);
+    const opHrs = extractHours(operatorHoursText) ||
+      (() => {
+        // "a day" = 8hrs, "two days" = 16hrs
+        if (/two days|2 days/i.test(operatorHoursText)) return 16;
+        if (/a day|one day|1 day/i.test(operatorHoursText)) return 8;
+        return 0;
+      })();
+    if (dayVal > 0 && opHrs > 0) {
+      ceoWeeklyCost = Math.round((dayVal / 8) * opHrs);
     }
   }
 
-  // 3. Rob's own 12-month win scenario — most credible number, use directly
+  if (ceoWeeklyCost > 0) {
+    const ceoAnnual = ceoWeeklyCost * 52;
+    rows.push({ label: 'CEO time lost to operator work (annualised)', val: ceoAnnual });
+    total += ceoAnnual;
+  }
+
+  // ── Bucket 2: Missed contract revenue ────────────────────────────────────
+  // Use TYPICAL contract value (smallest number Rob mentioned, not the outlier)
+  // Conservative 33% win rate applied against count he stated.
+
+  const missedText = answers['missed_contracts_value'] || '';
+  const allContractVals = [...missedText.matchAll(/[$]?([\d,]+(?:\.\d+)?)\s*(million|m|k)?/gi)]
+    .map(m => {
+      let v = parseFloat(m[1].replace(/,/g, ''));
+      const s = (m[2] || '').toLowerCase();
+      if (s === 'million' || s === 'm') v *= 1000000;
+      else if (s === 'k') v *= 1000;
+      return v;
+    })
+    .filter(v => v >= 1000000);
+
+  const typicalVal = allContractVals.length > 0 ? Math.min(...allContractVals) : 0;
+  const countMatch = (answers['missed_contracts_count'] || '').match(/\d+/);
+  const missedCount = countMatch ? Math.min(parseInt(countMatch[0]), 6) : 0;
+
+  if (typicalVal > 0 && missedCount > 0) {
+    // Conservative: assume just ONE win from all the contracts he passed on
+    // Uses typical (not largest) contract value
+    // This is the most defensible figure in a meeting — Rob can't argue he'd win zero
+    // when he wins 70% of what he actually bids on
+    const missedRevenue = typicalVal; // one typical contract win
+    rows.push({
+      label: 'Revenue from 1 missed contract win (conservative, of ' + missedCount + ' passed on)',
+      val: missedRevenue
+    });
+    total += missedRevenue;
+  }
+
+  // ── Bucket 3: Net profit on target contracts ──────────────────────────────
+  // Rob's own gross revenue estimate × his stated margin % = net profit.
+  // Showing net profit (not gross) avoids double-counting with bucket 2
+  // and gives a defensible, realistic figure for the meeting.
+
   const winVal = extractLargestDollar(answers['win_scenario_impact'] || '');
   if (winVal > 0) {
-    rows.push({ label: 'Revenue from 2-3 major contracts (Rob\'s estimate)', val: winVal });
-    total += winVal;
+    const marginText = answers['job_value_margin'] || '';
+    const pctMatch = marginText.match(/(\d+(?:\.\d+)?)\s*%/);
+    const marginPct = pctMatch ? parseFloat(pctMatch[1]) / 100 : 0;
+
+    if (marginPct > 0 && marginPct < 1) {
+      const netProfit = Math.round(winVal * marginPct);
+      rows.push({
+        label: 'Net profit on 2-3 major contracts at ' + Math.round(marginPct * 100) + '% margin',
+        val: netProfit
+      });
+      total += netProfit;
+    } else {
+      // No margin stated — show gross, labelled clearly
+      rows.push({
+        label: "Gross revenue from 2-3 major contracts (Rob's estimate, pre-cost)",
+        val: winVal
+      });
+      total += winVal;
+    }
   }
 
   return { rows, total };
 }
+
+
 </script>
 
 <!-- Shared engine — loaded after CONFIG and calcROI are defined -->
@@ -671,32 +752,52 @@ function showComplete() {
 // ─── Submit ───────────────────────────────────────────────────────────────────
 
 function submitAnswers() {
-  const btn = document.querySelector('.btn-submit');
-  let body = CONFIG.emailHeader + '\n' + '='.repeat(52) + '\n\n';
+  var btn = document.querySelector('.btn-submit');
+  var note = document.querySelector('.submit-note');
 
-  // ROI snapshot at top of email
+  var body = CONFIG.emailHeader + '\n' + '='.repeat(52) + '\n\n';
   if (typeof calcROI === 'function') {
-    const { rows, total } = calcROI();
-    if (total > 0) {
+    var roi = calcROI();
+    if (roi.total > 0) {
       body += '--- ROI SNAPSHOT ---\n';
-      rows.forEach(r => { body += r.label + ': ' + fmt(r.val) + '\n'; });
-      body += 'TOTAL: ' + fmt(total) + '/yr\n\n';
+      roi.rows.forEach(function(r) { body += r.label + ': ' + fmt(r.val) + '\n'; });
+      body += 'TOTAL: ' + fmt(roi.total) + '/yr\n\n';
     }
   }
-
-  // All answers
-  CONFIG.questions.forEach(q => {
+  CONFIG.questions.forEach(function(q) {
     if (q.section) body += '\n--- ' + q.section.toUpperCase() + ' ---\n\n';
     if (answers[q.key]) body += 'Q: ' + q.label + '\nA: ' + answers[q.key] + '\n\n';
   });
 
-  const subject = encodeURIComponent(CONFIG.emailSubject);
-  window.location.href = 'mailto:' + CONFIG.emailTo + '?subject=' + subject + '&body=' + encodeURIComponent(body);
-
-  btn.textContent = 'Email app opening...';
+  btn.textContent = 'Sending...';
   btn.disabled = true;
-  document.querySelector('.submit-note').textContent =
-    'Your email app will open with everything pre-filled. Just hit send.';
+
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      access_key: 'be8e618e-19e3-4b81-abf3-eb903e6d11ad',
+      subject: 'Pre-Blueprint Prep - Rob Tuaati - Maynz Construction - Fri 28 March',
+      from_name: 'Business AI Interview Forms',
+      message: body
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      btn.textContent = 'Sent to Tim';
+      if (note) note.textContent = 'Your answers have been sent. Tim will review before Friday.';
+    } else {
+      btn.textContent = 'Send to Tim';
+      btn.disabled = false;
+      if (note) note.textContent = 'Something went wrong - please try again.';
+    }
+  })
+  .catch(function() {
+    btn.textContent = 'Send to Tim';
+    btn.disabled = false;
+    if (note) note.textContent = 'Something went wrong - please try again.';
+  });
 }
 
 </script>
