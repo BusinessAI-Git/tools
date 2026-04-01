@@ -287,8 +287,8 @@ async function sendAnswer() {
   else { answers[q.key] = text; }
   conversationHistory.push({role:"user", content:text});
   showTyping();
-  var req = REQUIREMENTS[currentQ+1] ? "\n\nQUESTION REQUIREMENT:\n" + REQUIREMENTS[currentQ+1] : "\n\nQUESTION REQUIREMENT:\nIf the answer addresses the question with reasonable clarity, append [ADVANCE]. If vague or missing key information, ask one focused follow-up.";
-  var systemPrompt = BASE_PROMPT + "\n\nYou are on question " + (currentQ+1) + " of " + QUESTIONS.length + ". The question was: " + q.q + "\n\n" + ROLE_PROMPT + req;
+  var reqText = REQUIREMENTS[currentQ+1] || "If the answer addresses the question with reasonable clarity, append [ADVANCE]. If vague or missing key information, ask one focused follow-up.";
+  var systemPrompt = BASE_PROMPT + " --- You are on question " + (currentQ+1) + " of " + QUESTIONS.length + ". The question asked to Julia was: " + q.q + " --- ROLE INSTRUCTIONS: " + ROLE_PROMPT + " --- QUESTION REQUIREMENT (this must be met before you append [ADVANCE]): " + reqText;
   var fetchWithTimeout = function(url, opts, ms) {
     var ctrl = new AbortController();
     var t = setTimeout(function(){ctrl.abort();}, ms);
@@ -314,9 +314,10 @@ async function sendAnswer() {
       else { setTimeout(function(){showComplete();}, 900); }
     } else { isProbing = true; enableInput(); }
   } catch(e) {
-    removeTyping(); isProbing = false; currentQ++;
-    if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
-    else { setTimeout(function(){showComplete();}, 900); }
+    removeTyping();
+    addMessage("ai", "Sorry, I'm not quite getting that -- can you put it another way to answer the question?");
+    isProbing = true;
+    enableInput();
   }
 }
 
