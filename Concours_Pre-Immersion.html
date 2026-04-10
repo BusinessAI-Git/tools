@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business AI - ROI Discovery - Concours</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#2ECC71;--green-light:#4DDB87;--green-dim:rgba(46,204,113,0.1);--green-border:rgba(46,204,113,0.22);
+  --dark:#0C0F0A;--dark-2:#111510;--dark-3:#181C15;--dark-4:#1F251B;--dark-5:#272E22;
+  --text:#EEF2E8;--text-muted:#8A9E7A;--text-dim:#3A4A30;
+  --border:rgba(238,242,232,0.07);--border-2:rgba(238,242,232,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:"Barlow",sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% -5%,rgba(46,204,113,0.06),transparent);pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;width:100%;max-width:680px;padding:0 24px 80px}
+.header{padding:44px 0 36px;border-bottom:2px solid var(--green);margin-bottom:40px}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.logo-block{width:18px;height:18px;background:var(--green);transform:rotate(45deg)}
+.logo-text{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--green)}
+.header h1{font-family:"Barlow Condensed",sans-serif;font-size:clamp(26px,4.5vw,38px);font-weight:800;line-height:1.08;color:var(--text);letter-spacing:-0.01em;text-transform:uppercase;margin-bottom:8px}
+.header h1 em{font-style:italic;color:var(--green-light);text-transform:none}
+.header p{font-size:14px;color:var(--text-muted);line-height:1.7;max-width:440px}
+.intro-card{background:var(--dark-2);border:1px solid var(--border-2);border-left:3px solid var(--green);border-radius:8px;padding:32px 28px;margin-bottom:24px}
+.intro-card h2{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:14px;color:var(--text)}
+.intro-card p{font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:12px}
+.intro-card p:last-of-type{margin-bottom:0}
+.snapshot-grid{background:var(--dark-3);border:1px solid var(--border-2);border-radius:6px;padding:16px;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sg-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:600}
+.sg-value{font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:700;color:var(--green-light)}
+.intro-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.ipill{display:flex;align-items:center;gap:7px;background:var(--dark-3);border:1px solid var(--border-2);border-radius:4px;padding:6px 12px;font-size:12px;color:var(--text-muted);font-weight:500}
+.ipill-dot{width:5px;height:5px;border-radius:1px;background:var(--green);transform:rotate(45deg)}
+.btn-start{background:var(--green);color:var(--dark);border:none;border-radius:6px;padding:15px 44px;font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;display:inline-block}
+.btn-start:hover{background:var(--green-light);transform:translateY(-1px)}
+#chat-screen{display:none}
+.progress-wrap{margin-bottom:32px}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.prog-phase{font-size:11px;color:var(--green);font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
+.prog-track{height:3px;background:var(--dark-5);border-radius:0}
+.prog-fill{height:100%;background:var(--green);border-radius:0;transition:width 0.6s ease;width:0%}
+.messages{display:flex;flex-direction:column;gap:18px;margin-bottom:24px;min-height:100px}
+.msg{display:flex;gap:12px;animation:msgIn 0.35s ease forwards;opacity:0}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{width:34px;height:34px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:800;letter-spacing:0.05em;margin-top:2px;text-transform:uppercase}
+.msg-avatar.ai{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green-light)}
+.msg-avatar.user{background:var(--dark-3);border:1px solid var(--border-2);color:var(--text-muted)}
+.msg-bubble{flex:1;padding-top:4px}
+.msg-bubble .sender{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.msg-bubble.ai .sender{color:var(--green)}
+.msg-bubble .text{font-size:15px;line-height:1.75;color:var(--text)}
+.msg-bubble.user .text{color:var(--text-muted)}
+.section-divider{display:flex;align-items:center;gap:12px;margin:4px 0;animation:msgIn 0.35s ease forwards;opacity:0}
+.section-divider::before,.section-divider::after{content:"";flex:1;height:1px;background:var(--border-2)}
+.section-divider span{font-size:10px;font-weight:800;font-family:"Barlow Condensed",sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+.typing{display:flex;gap:12px;align-items:center}
+.typing-dots{display:flex;gap:5px;padding-top:6px}
+.typing-dots span{width:5px;height:5px;background:var(--green);border-radius:50%;animation:tdot 1.2s infinite;opacity:0.35}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-5px);opacity:1}}
+.input-area{background:var(--dark-2);border:1px solid var(--border-2);border-radius:8px;padding:14px;transition:border-color 0.2s}
+.input-area:focus-within{border-color:var(--green-border)}
+textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:"Barlow",sans-serif;font-size:15px;font-weight:300;line-height:1.6;resize:none;min-height:56px;max-height:160px}
+textarea#user-input::placeholder{color:var(--text-dim)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--dark-5)}
+.mic-hint{font-size:11px;color:var(--text-dim)}
+.btn-send{background:var(--green);color:var(--dark);border:none;border-radius:5px;padding:8px 20px;font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.btn-send:hover{background:var(--green-light)}
+.btn-send:disabled{opacity:0.35;cursor:default}
+#complete-screen{display:none;text-align:center;padding:32px 0 0}
+.complete-mark{width:56px;height:56px;border-radius:8px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:20px}
+.complete-card{background:var(--dark-2);border:1px solid var(--border-2);border-left:3px solid var(--green);border-radius:8px;padding:28px;margin:26px 0;text-align:left}
+.complete-card h3{font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:18px;color:var(--green-light)}
+.answer-item{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--dark-4)}
+.answer-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.answer-q{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;font-weight:600}
+.answer-a{font-size:14px;color:var(--text-muted);line-height:1.65}
+.roi-summary{background:var(--dark-3);border:1px solid var(--green-border);border-radius:8px;padding:22px;margin-top:20px}
+.roi-summary h4{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:800;color:var(--green-light);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px}
+.roi-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--text-muted);margin-bottom:8px}
+.roi-row b{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:var(--text);font-size:15px}
+.roi-subtotal{display:flex;justify-content:space-between;align-items:baseline;font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.06em;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-2)}
+.roi-total{border-top:2px solid var(--green-border);margin-top:14px;padding-top:12px;display:flex;justify-content:space-between;align-items:baseline;font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;color:var(--green-light);text-transform:uppercase;letter-spacing:0.04em}
+.btn-submit{background:var(--green);color:var(--dark);border:none;border-radius:6px;padding:15px 36px;font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-top:8px}
+.btn-submit:hover{background:var(--green-light);transform:translateY(-1px)}
+.submit-note{font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.5}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dark-5);border-radius:2px}
+@media(max-width:480px){.page{padding:0 16px 60px}.header{padding:28px 0 28px}.intro-card{padding:24px 18px}.snapshot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo-row"><div class="logo-block"></div><div class="logo-text">Business AI</div></div>
+    <h1>What is the status quo <em>really</em> costing you?</h1>
+    <p>15 questions to put a dollar figure on what inefficiency, wasted time, and missed opportunity is costing Concours across all three businesses.</p>
+  </div>
+  <div id="intro-screen">
+    <div class="intro-card">
+      <h2>Hi Brock &#8212; before we meet.</h2>
+      <p>You already know there are inefficiencies. What we need before our session is the actual dollar cost of them &#8212; so when we sit down together we can show you exactly what fixing them is worth, not just in theory but in real numbers.</p>
+      <p>These questions cover your time, your dad's time, what's leaking on the workshop floor, and what's sitting there waiting to be captured across car sales, parts, and restoration. Honest answers get you honest numbers.</p>
+      <p>Takes about 15 minutes. Voice dictation works on mobile.</p>
+      <div class="snapshot-grid">
+        <div class="sg-item"><div class="sg-label">Business</div><div class="sg-value">Concours</div></div>
+        <div class="sg-item"><div class="sg-label">Combined revenue</div><div class="sg-value">~$4-5M</div></div>
+        <div class="sg-item"><div class="sg-label">Target</div><div class="sg-value">$10M in 12 months</div></div>
+        <div class="sg-item"><div class="sg-label">Team</div><div class="sg-value">14 staff</div></div>
+      </div>
+      <div class="intro-pills">
+        <div class="ipill"><div class="ipill-dot"></div>~15 minutes</div>
+        <div class="ipill"><div class="ipill-dot"></div>Voice dictation supported</div>
+        <div class="ipill"><div class="ipill-dot"></div>Answers go straight to Tim</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="engineInit()">Let&#39;s go &rarr;</button>
+  </div>
+  <div id="chat-screen">
+    <div class="progress-wrap">
+      <div class="prog-meta">
+        <span class="prog-label" id="prog-label">Question 1 of 15</span>
+        <span class="prog-phase" id="prog-phase">Your time</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <textarea id="user-input" placeholder="Type your answer, or use your mic on mobile..." rows="3"></textarea>
+      <div class="input-footer">
+        <div class="mic-hint">&#127908; Tap mic on your keyboard to speak</div>
+        <button class="btn-send" id="send-btn" onclick="sendAnswer()">Send &rarr;</button>
+      </div>
+    </div>
+  </div>
+  <div id="complete-screen">
+    <div class="complete-mark">&#10003;</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Done, Brock.</h2>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:460px;margin:0 auto;">Tim will review your answers before your session so you can get straight into solutions.</p>
+    <div class="complete-card">
+      <h3>Your answers</h3>
+      <div id="answers-summary"></div>
+      <div class="roi-summary" id="roi-summary" style="display:none">
+        <h4>Costs due to inefficiencies of time &#8212; annual</h4>
+        <div id="roi-rows-waste"></div>
+        <div class="roi-subtotal" id="roi-subtotal-waste"></div>
+        <h4 style="margin-top:16px">Lost profit &#8212; annual</h4>
+        <div id="roi-rows-profit"></div>
+        <div class="roi-subtotal" id="roi-subtotal-profit"></div>
+        <div class="roi-total"><span>Combined annual cost of status quo</span><span id="roi-total-val">-</span></div>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitAnswers()">Send to Tim &rarr;</button>
+    <p class="submit-note">Your answers will be sent directly to tim.ahern@businessai.com.au</p>
+  </div>
+</div>
+<script>
+var ACCESS_KEY = "be8e618e-19e3-4b81-abf3-eb903e6d11ad";
+
+var QUESTIONS = [
+  {section:"Your time", q:"You spend roughly 3 to 4 hours a day on admin -- emails, quoting, invoicing, phone calls, accounting. What does an hour of your time actually cost the business right now in real terms -- your salary, super, and on-costs combined, broken down to an hourly figure?", key:"brock_hourly_cost", label:"Brock's real hourly cost to the business"},
+  {q:"At Empire you wrote $695 on your hand as what an hour of your time should be worth strategically. Of those 3 to 4 hours a day you spend on admin -- how many of those hours are genuinely worth $695 of your time, and how many could someone or something else be doing?", key:"brock_high_value_hours", label:"Brock's high-value admin hours per day (remainder are low-value)"},
+  {section:"Your dad's time", q:"Your dad is doing similar -- picking up cars, doing deliveries, running tasks a general manager should not be near. How many hours a week would you say he is spending on work that is below his level?", key:"dad_low_value_hours", label:"Dad's low-value hours per week"},
+  {q:"What does your dad's time actually cost the business per hour in real terms -- his salary, super, and on-costs broken down to an hourly figure?", key:"dad_hourly_cost", label:"Dad's real hourly cost to the business"},
+  {section:"The workshop floor", q:"There is currently no task management system -- work gets communicated verbally, parts get ordered on handwritten notes, and things get forgotten or done twice. Roughly how many hours per week per technician would you say are lost to go-slow work -- time where someone does not quite know what to do next, is waiting on instruction, or is doing something twice?", key:"tech_lost_hours", label:"Estimated hours lost per technician per week"},
+  {q:"What is the average hourly wage you are paying your technicians?", key:"tech_hourly_wage", label:"Average technician hourly wage"},
+  {q:"When a job runs over by a day -- or more -- what do you think that does to your reputation with that client? These are wealthy people with collections of cars, who talk to each other. How do you think late delivery lands with them, and do you feel it has cost you repeat work or referrals that you will never be able to put an exact number on?", key:"reputation_impact", label:"Reputation impact of late job delivery"},
+  {section:"Revenue you are not capturing", q:"Car sales -- a million dollar car generating $100K profit can happen a few times a year. What is the realistic number of those transactions you think you could be doing in the next 12 months if you had the time and systems to actively pursue it? And what would that add to your bottom line profit?", key:"car_sales_upside", label:"Car sales profit upside in 12 months"},
+  {q:"Your customer database is wealthy people with collections of cars. You used to contact them fortnightly -- now it is every couple of months. What do you think you are leaving on the table in profit annually -- across restoration work, car sales, parts, and referrals combined?", key:"database_upside", label:"Annual profit left behind from under-contacted database"},
+  {q:"The parts and wheels business -- what profit does it generate right now annually, and what do you think it could realistically generate in profit in 12 months if someone was actually focused on growing it?", key:"parts_business_upside", label:"Parts business current vs target annual profit"},
+  {section:"The cost of the status quo", q:"The restoration business charges a high hourly rate but nets around 10%. Stripping out the inefficiencies we have been talking about -- time lost, jobs overrunning, your time and your dad's time in the wrong work -- what do you think the margin should realistically be as a percentage?", key:"target_margin_pct", label:"What the restoration margin should realistically be"},
+  {q:"What is the current annual revenue of the restoration business specifically -- not the group total, just Concours restoration?", key:"restoration_revenue", label:"Current annual restoration revenue"},
+  {q:"You have been properly in the business for about three years. In that time, what is your gut feel on how much profit has leaked out through these inefficiencies -- wasted labour, jobs overrunning, your time and your dad's time in the wrong work? We are talking bottom line profit lost, not revenue. Best estimate over those three years combined.", key:"three_year_leakage", label:"Estimated profit leaked over 3 years of inefficiency"},
+  {section:"What solving it unlocks", q:"If your admin load dropped from 3 to 4 hours a day to 1 hour of reviewing and approving -- and that freed time went into growing car sales and pursuing the acquisitions you are planning -- what is the additional profit you think you could generate in the next 12 months with that time back?", key:"strategic_time_upside", label:"Additional profit from strategic time recovered"},
+  {q:"You have written down $10M as the 12-month target across all businesses. What is the single biggest bottleneck right now that would stop you getting there -- and if that one thing was removed, what does the path to $10M look like in your own words?", key:"path_to_10m", label:"Biggest bottleneck and path to $10M"}
+];
+
+var PHASES = {0:"Your time", 2:"Your dad's time", 4:"The workshop floor", 7:"Revenue you are not capturing", 10:"The cost of the status quo", 13:"What solving it unlocks"};
+
+var REQUIREMENTS = {
+  1: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for his real hourly cost to the business -- salary, super, and on-costs. If he gives a range, tell him you will use the higher figure. If he says he does not know, ask him to estimate based on his annual salary divided by 2000 working hours. Do NOT suggest a number. Do NOT advance without a specific dollar figure.",
+  2: "CRITICAL ROI FIELD: Brock must give a specific number of hours per day that are genuinely HIGH-value -- worth his $695 strategic rate. The calculator will subtract this from 3.5 hours (the midpoint of his 3-4hr daily admin) to get the low-value hours. If he says 1 hour is genuinely high-value work, the remaining 2.5 hours are low-value. Do NOT advance without a specific number of high-value hours per day.",
+  3: "CRITICAL ROI FIELD: Brock must give a specific number of hours per week his dad spends on below-level work. If vague, ask: Put a number on it -- how many hours a week roughly? Do NOT advance without a specific number.",
+  4: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for his dad's real hourly cost -- salary, super, on-costs. Same rules as Q1. If a range, take the higher. Do NOT advance without a specific dollar figure.",
+  5: "CRITICAL ROI FIELD: Brock must give a specific number of hours lost per technician per week to go-slow work. If vague, ask: Just your best estimate -- how many hours per person per week? Even a rough number is fine. Do NOT advance without a specific number.",
+  6: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for average technician hourly wage. If a range, take the higher. Do NOT advance without a specific dollar figure.",
+  7: "QUALITATIVE QUESTION: This is about reputation impact -- there is no dollar figure needed. Accept whatever Brock says about the effect on client relationships and referrals. Append [ADVANCE] once he has given a genuine answer about the impact.",
+  8: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for the profit upside from car sales in the next 12 months. If he gives a number of transactions without a dollar figure, ask: And what does that add up to in profit? Do NOT suggest any number. Do NOT advance without a dollar figure.",
+  9: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for the profit being left behind from the under-contacted database annually. Vague answers like hard to say, not sure, or difficult to quantify are NOT acceptable -- keep probing. Try: Think about it this way -- if you contacted your database properly and even one client came back for a restoration job, what would that be worth in profit? Or: What is your gut feel -- even a rough ballpark in dollar terms? Do NOT suggest any number. Do NOT advance without a dollar figure.",
+  10: "CRITICAL ROI FIELD: Brock must give (a) a current annual profit figure for the parts business AND (b) a target annual profit figure for 12 months. If he gives revenue instead of profit, ask him to clarify the profit figure. Do NOT advance without both numbers.",
+  11: "CRITICAL ROI FIELD: Brock must give a specific percentage for what the restoration margin should be. More, higher, or better than now is not acceptable. If vague, ask: Give me a number -- what percentage should the margin realistically be? Do NOT suggest any number. Do NOT advance without a specific percentage.",
+  12: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for the current annual revenue of the restoration business only. If he gives a combined figure, ask him to break out restoration specifically. Do NOT advance without a specific dollar figure.",
+  13: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for the estimated profit leaked over 3 years. If vague, ask: What is your gut feel in dollar terms -- even a rough figure? Do NOT suggest any number. Do NOT advance without a dollar figure.",
+  14: "CRITICAL ROI FIELD: Brock must give a specific dollar figure for the additional profit he could generate in the next 12 months if his admin time was freed up. Do NOT suggest any number. Do NOT advance without a dollar figure.",
+  15: "QUALITATIVE QUESTION: Brock is describing his biggest bottleneck and his vision for getting to $10M. No dollar figure needed. Accept a thoughtful answer and append [ADVANCE]."
+};
+
+var BASE_PROMPT = "You are a sharp, direct AI assistant running a pre-meeting ROI discovery for Business AI, an Australian AI automation company. You are talking to Brock King, who co-owns Concours with his father on the Central Coast, NSW. Concours has three businesses: (1) Concours restoration -- a 30-year-old sports car restoration business, 11 technicians, ~$3M revenue, currently netting around 10% margin; (2) Concours car sales -- consignment and direct sales of high-value and prestige cars, clients are wealthy collectors; (3) A parts and wheels business -- an automotive parts/wheels business that is a vertical extension of the restoration business. Combined revenue across all three is roughly $4-5M. The 12-month target is $10M. Key problems: no task management system on the workshop floor (Google Sheets is the most advanced tool they use), work is communicated verbally, parts ordered on handwritten notes, jobs run over time and budget, Brock spends 3-4 hours a day on low-level admin, his dad (co-owner and general manager) is doing hands-on tasks well below his level, the customer database of wealthy car collectors is barely being contacted. Brock attended Empire Mastery last week and wrote $695 on his hand as his strategic hourly value. He is motivated to change but realistic -- not looking for overnight fixes. His dad is on board but not in this interview. Tone for Brock: relaxed, straight-talking, no-nonsense, a bit dry. He has worked in a marketing agency before so he understands systems thinking. Do not be corporate or stiff.";
+
+var ROLE_PROMPT = "The client has just answered a question. Your job: (1) Acknowledge in ONE short sentence -- match Brock's energy, relaxed and direct, no corporate tone. (2) Check if the answer meets the QUESTION REQUIREMENT. (3) If YES -- append [ADVANCE] at the very end of your reply. (4) If NO -- ask ONE focused follow-up, one sentence only. (5) You may probe multiple times until requirement is met. Every reply either ends with [ADVANCE] or asks a follow-up, never both. CRITICAL RULE: NEVER suggest, imply, calculate or reference any specific dollar figure, hourly rate, or numerical estimate when probing. Brock must generate every number himself. Ask open questions only. Tone: relaxed, peer-level, a bit dry. No bullet points. No lists. No sycophancy.";
+
+var currentQ = 0, answers = {}, conversationHistory = [], isWaiting = false, isProbing = false;
+
+function engineInit() {
+  document.getElementById("intro-screen").style.display = "none";
+  document.getElementById("chat-screen").style.display = "block";
+  askQuestion(0);
+  document.getElementById("user-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAnswer(); }
+  });
+}
+
+function updateProgress() {
+  var pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-label").textContent = "Question " + (Math.min(currentQ+1, QUESTIONS.length)) + " of " + QUESTIONS.length;
+  var phase = "Your time";
+  var keys = Object.keys(PHASES).map(Number).sort(function(a,b){return a-b;});
+  for (var i = 0; i < keys.length; i++) { if (currentQ >= keys[i]) phase = PHASES[keys[i]]; }
+  document.getElementById("prog-phase").textContent = phase;
+}
+
+function addMessage(role, text) {
+  var msgs = document.getElementById("messages");
+  if (role === "section") {
+    var d = document.createElement("div");
+    d.className = "section-divider"; d.style.animationDelay = "0.05s";
+    d.innerHTML = "<span>" + text + "</span>";
+    msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return;
+  }
+  var d = document.createElement("div");
+  d.className = "msg"; d.style.animationDelay = "0.05s";
+  var ai = role === "ai";
+  var avatar = document.createElement("div");
+  avatar.className = "msg-avatar " + (ai ? "ai" : "user");
+  avatar.textContent = ai ? "BAI" : "BK";
+  var bubble = document.createElement("div");
+  bubble.className = "msg-bubble " + (ai ? "ai" : "user");
+  var sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = ai ? "Business AI" : "Brock";
+  var textEl = document.createElement("div");
+  textEl.className = "text";
+  textEl.innerHTML = text.split("\n").join("<br>");
+  bubble.appendChild(sender); bubble.appendChild(textEl);
+  d.appendChild(avatar); d.appendChild(bubble);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  var msgs = document.getElementById("messages");
+  var d = document.createElement("div");
+  d.className = "typing"; d.id = "typing-indicator";
+  var av = document.createElement("div"); av.className = "msg-avatar ai"; av.textContent = "BAI";
+  var dots = document.createElement("div"); dots.className = "typing-dots";
+  dots.innerHTML = "<span></span><span></span><span></span>";
+  d.appendChild(av); d.appendChild(dots);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { var t = document.getElementById("typing-indicator"); if (t) t.remove(); }
+
+function askQuestion(index) {
+  updateProgress();
+  var q = QUESTIONS[index];
+  if (q.section) {
+    setTimeout(function() {
+      addMessage("section", q.section);
+      setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 350);
+    }, 200);
+  } else {
+    setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 300);
+  }
+}
+
+function enableInput() {
+  document.getElementById("user-input").disabled = false;
+  document.getElementById("send-btn").disabled = false;
+  document.getElementById("user-input").focus();
+  isWaiting = false;
+}
+
+function disableInput() {
+  document.getElementById("user-input").disabled = true;
+  document.getElementById("send-btn").disabled = true;
+  isWaiting = true;
+}
+
+async function sendAnswer() {
+  if (isWaiting) return;
+  var input = document.getElementById("user-input");
+  var text = input.value.trim();
+  if (!text) return;
+  disableInput();
+  addMessage("user", text);
+  input.value = "";
+  var q = QUESTIONS[currentQ];
+  if (isProbing) { answers[q.key] = (answers[q.key] || "") + " | " + text; }
+  else { answers[q.key] = text; }
+  conversationHistory.push({role:"user", content:text});
+  showTyping();
+  var requirement = REQUIREMENTS[currentQ+1]
+    ? "\n\nQUESTION REQUIREMENT:\n" + REQUIREMENTS[currentQ+1]
+    : "\n\nQUESTION REQUIREMENT:\nIf the answer addresses the question with reasonable clarity, append [ADVANCE]. If vague or missing key information, ask one focused follow-up.";
+  var systemPrompt = BASE_PROMPT
+    + "\n\nYou are on question " + (currentQ+1) + " of " + QUESTIONS.length
+    + ". The question was: \"" + q.q + "\""
+    + "\n\n" + ROLE_PROMPT
+    + requirement;
+  var fetchWithTimeout = function(url, opts, ms) {
+    var controller = new AbortController();
+    var timer = setTimeout(function(){controller.abort();}, ms);
+    return fetch(url, Object.assign({}, opts, {signal:controller.signal})).finally(function(){clearTimeout(timer);});
+  };
+  try {
+    var response = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:300, system:systemPrompt, messages:conversationHistory})
+    }, 12000);
+    var data = await response.json();
+    removeTyping();
+    var aiReply = (data.content && data.content[0]) ? data.content[0].text : "";
+    var shouldAdvance = aiReply.includes("[ADVANCE]");
+    aiReply = aiReply.replace("[ADVANCE]", "").trim();
+    if (!aiReply) aiReply = shouldAdvance ? "Got it." : "Can you give me a bit more detail on that?";
+    conversationHistory.push({role:"assistant", content:aiReply});
+    addMessage("ai", aiReply);
+    if (shouldAdvance) {
+      isProbing = false;
+      currentQ++;
+      if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+      else { setTimeout(function(){showComplete();}, 900); }
+    } else {
+      isProbing = true;
+      enableInput();
+    }
+  } catch(err) {
+    removeTyping();
+    isProbing = false;
+    currentQ++;
+    if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+    else { setTimeout(function(){showComplete();}, 900); }
+  }
+}
+
+function extractLargestDollar(text) {
+  if (!text) return 0;
+  var matches = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)(?=[^a-z]|$)/gi));
+  var also = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)/g));
+  var best = 0;
+  var process = function(m, hasSuffix) {
+    var val = parseFloat(m[1].replace(/,/g,""));
+    if (hasSuffix) {
+      var sfx = (m[2]||"").toLowerCase();
+      if (sfx==="million"||sfx==="m") val*=1000000;
+      else if (sfx==="thousand"||sfx==="k") val*=1000;
+    }
+    if (val>=1000&&val>best) best=val;
+  };
+  for (var m of matches) process(m, true);
+  for (var m of also) process(m, false);
+  return best;
+}
+
+function extractPercent(text) {
+  if (!text) return 0;
+  var m = text.match(/(\d+(?:\.\d+)?)\s*%/);
+  return m ? parseFloat(m[1]) / 100 : 0;
+}
+
+function extractSmallestDollar(text) {
+  if (!text) return 0;
+  var matches = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)(?=[^a-z]|$)/gi));
+  var also = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)/g));
+  var found = [];
+  var process = function(m, hasSuffix) {
+    var val = parseFloat(m[1].replace(/,/g,""));
+    if (hasSuffix) {
+      var sfx = (m[2]||"").toLowerCase();
+      if (sfx==="million"||sfx==="m") val*=1000000;
+      else if (sfx==="thousand"||sfx==="k") val*=1000;
+    }
+    if (val>=1000) found.push(val);
+  };
+  for (var m of matches) process(m, true);
+  for (var m of also) process(m, false);
+  return found.length > 0 ? Math.min.apply(null, found) : 0;
+}
+
+function extractRate(text) {
+  // For hourly rates -- small numbers in the $20-$500 range
+  // Handles: 65, $65, $65/hr, 65 per hour, about 65, roughly 65
+  if (!text) return 0;
+  var matches = Array.from(text.matchAll(/[$]?(\d+(?:\.\d+)?)/g));
+  for (var m of matches) {
+    var val = parseFloat(m[1]);
+    if (val >= 20 && val <= 500) return val;
+  }
+  return 0;
+}
+
+function extractHours(text) {
+  if (!text) return 0;
+  // First try: explicit hours/hrs unit
+  var m = text.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)/i);
+  if (m) return parseFloat(m[1]);
+  // Second try: "X per day" or "X per week" pattern
+  var p = text.match(/(\d+(?:\.\d+)?)\s*(?:per|a)\s*(?:day|week)/i);
+  if (p) return parseFloat(p[1]);
+  // Third try: first standalone number in the answer
+  var n = text.match(/(\d+(?:\.\d+)?)/);
+  if (n) return parseFloat(n[1]);
+  return 0;
+}
+
+function fmt(n) {
+  if (n>=1000000) return "$"+(n/1000000).toFixed(1)+"M";
+  if (n>=1000) return "$"+Math.round(n/1000)+"K";
+  return "$"+Math.round(n).toLocaleString();
+}
+
+function calcROI() {
+  var wasteRows=[], profitRows=[], wasteTotal=0, profitTotal=0, total=0;
+
+  // BUCKET 1: Brock's wasted admin time
+  // He stated how many hours per day are HIGH-value (worth $695).
+  // Low-value hours = 3.5 (midpoint of his 3-4hr daily admin) minus high-value hours.
+  // Cost = low-value hours/day x 5 days x 52 weeks x his real hourly rate.
+  var brockRate = extractRate(answers["brock_hourly_cost"]||"");
+  var highValueHrs = extractHours(answers["brock_high_value_hours"]||"");
+  var lowValueHrs = (highValueHrs > 0 && highValueHrs < 3.5) ? (3.5 - highValueHrs) : 0;
+  if (brockRate > 0 && lowValueHrs > 0) {
+    var brockWastedAnnual = Math.round(brockRate * lowValueHrs * 5 * 52);
+    wasteRows.push({label:"Brock admin time in wrong work ("+lowValueHrs.toFixed(1)+"hrs/day, "+(Math.round(lowValueHrs*5*52))+"hrs/yr)", val:brockWastedAnnual});
+    wasteTotal += brockWastedAnnual; total += brockWastedAnnual;
+  }
+
+  // BUCKET 2: Dad's wasted time
+  var dadRate = extractRate(answers["dad_hourly_cost"]||"");
+  var dadHrs = extractHours(answers["dad_low_value_hours"]||"");
+  if (dadRate > 0 && dadHrs > 0) {
+    var dadWastedAnnual = Math.round(dadRate * dadHrs * 52);
+    wasteRows.push({label:"Dad low-level work time ("+dadHrs+"hrs/wk, "+(Math.round(dadHrs*52))+"hrs/yr)", val:dadWastedAnnual});
+    wasteTotal += dadWastedAnnual; total += dadWastedAnnual;
+  }
+
+  // BUCKET 3: Workshop floor go-slow cost
+  // hours per tech per week x 11 staff x tech wage x 52
+  var techWage = extractRate(answers["tech_hourly_wage"]||"");
+  var techLostHrs = extractHours(answers["tech_lost_hours"]||"");
+  if (techWage > 0 && techLostHrs > 0) {
+    var floorCostAnnual = Math.round(techWage * techLostHrs * 11 * 52);
+    wasteRows.push({label:"Workshop inefficiencies ("+techLostHrs+"hrs/tech/wk, "+(Math.round(techLostHrs*11*52))+"hrs/yr across team)", val:floorCostAnnual});
+    wasteTotal += floorCostAnnual; total += floorCostAnnual;
+  }
+
+  // BUCKET 4: Margin improvement on restoration
+  // (target% - 10%) x restoration revenue
+  var targetMarginPct = extractPercent(answers["target_margin_pct"]||"");
+  var restorationRevenue = extractLargestDollar(answers["restoration_revenue"]||"");
+  if (targetMarginPct > 0.10 && restorationRevenue > 0) {
+    var marginGain = Math.round((targetMarginPct - 0.10) * restorationRevenue);
+    profitRows.push({label:"Margin improvement ("+Math.round(targetMarginPct*100)+"% target vs 10% now, on $"+Math.round(restorationRevenue/1000000*10)/10+"M restoration revenue)", val:marginGain});
+    profitTotal += marginGain; total += marginGain;
+  }
+
+  // BUCKET 5: Strategic time upside -- Brock's own estimate of profit from freed time
+  var strategicUpside = extractLargestDollar(answers["strategic_time_upside"]||"");
+  if (strategicUpside > 0) {
+    profitRows.push({label:"Strategic profit from time recovered (Brock's estimate)", val:strategicUpside});
+    profitTotal += strategicUpside; total += strategicUpside;
+  }
+
+  return {wasteRows:wasteRows, profitRows:profitRows, wasteTotal:wasteTotal, profitTotal:profitTotal, total:total};
+}
+
+function showComplete() {
+  document.getElementById("chat-screen").style.display = "none";
+  document.getElementById("complete-screen").style.display = "block";
+  window.scrollTo(0,0);
+  var el = document.getElementById("answers-summary"); el.innerHTML = "";
+  QUESTIONS.forEach(function(q) {
+    if (answers[q.key]) {
+      var d = document.createElement("div"); d.className = "answer-item";
+      var qq = document.createElement("div"); qq.className = "answer-q"; qq.textContent = q.label;
+      var aa = document.createElement("div"); aa.className = "answer-a"; aa.textContent = answers[q.key];
+      d.appendChild(qq); d.appendChild(aa); el.appendChild(d);
+    }
+  });
+  var roi = calcROI();
+  if ((roi.wasteRows.length > 0 || roi.profitRows.length > 0) && roi.total > 0) {
+    document.getElementById("roi-summary").style.display = "block";
+    document.getElementById("roi-rows-waste").innerHTML = roi.wasteRows.map(function(r){
+      return "<div class=\"roi-row\"><span>"+r.label+"</span><b>"+fmt(r.val)+"</b></div>";
+    }).join("");
+    if (roi.wasteTotal > 0) {
+      document.getElementById("roi-subtotal-waste").innerHTML = "<span>Subtotal inefficiency cost</span><b>"+fmt(roi.wasteTotal)+"/yr</b>";
+    }
+    document.getElementById("roi-rows-profit").innerHTML = roi.profitRows.map(function(r){
+      return "<div class=\"roi-row\"><span>"+r.label+"</span><b>"+fmt(r.val)+"</b></div>";
+    }).join("");
+    if (roi.profitTotal > 0) {
+      document.getElementById("roi-subtotal-profit").innerHTML = "<span>Subtotal lost profit</span><b>"+fmt(roi.profitTotal)+"/yr</b>";
+    }
+    document.getElementById("roi-total-val").textContent = fmt(roi.total)+"/yr";
+  }
+}
+
+function submitAnswers() {
+  var btn = document.querySelector(".btn-submit");
+  var note = document.querySelector(".submit-note");
+  var body = "ROI DISCOVERY - Brock King - Concours\n" + "=".repeat(52) + "\n\n";
+  var roi = calcROI();
+  if (roi.total > 0) {
+    body += "--- ESTIMATED LOST PROFIT SNAPSHOT ---\n";
+    roi.rows.forEach(function(r){ body += r.label + ": " + fmt(r.val) + "\n"; });
+    body += "TOTAL: " + fmt(roi.total) + "/yr\n\n";
+  }
+  QUESTIONS.forEach(function(q) {
+    if (q.section) body += "\n--- " + q.section.toUpperCase() + " ---\n\n";
+    if (answers[q.key]) body += "Q: " + q.label + "\nA: " + answers[q.key] + "\n\n";
+  });
+  btn.textContent = "Sending..."; btn.disabled = true;
+  fetch("https://api.web3forms.com/submit", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({access_key:ACCESS_KEY, subject:"ROI Discovery - Brock King - Concours", from_name:"Business AI Interview Forms", message:body})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (data.success) {
+      btn.textContent = "Sent to Tim";
+      if (note) note.textContent = "Your answers have been sent. Tim will review them before your session.";
+    } else {
+      btn.textContent = "Send to Tim"; btn.disabled = false;
+      if (note) note.textContent = "Something went wrong - please try again.";
+    }
+  })
+  .catch(function(){
+    btn.textContent = "Send to Tim"; btn.disabled = false;
+    if (note) note.textContent = "Something went wrong - please try again.";
+  });
+}
+</script>
+</body>
+</html>
