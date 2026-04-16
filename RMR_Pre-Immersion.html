@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business AI - Pre-Immersion - RMR Engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--coral:#E8445A;--coral-light:#F06B7C;--coral-dim:rgba(232,68,90,0.1);--coral-border:rgba(232,68,90,0.22);--navy:#0A1628;--navy-2:#0F1E35;--navy-3:#162440;--navy-4:#1E2E4A;--navy-5:#263855;--text:#F0F4FF;--text-muted:#8A9DBF;--text-dim:#3A4A6B;--border:rgba(240,244,255,0.07);--border-2:rgba(240,244,255,0.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(232,68,90,0.07),transparent);pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;width:100%;max-width:680px;padding:0 24px 80px}
+.header{padding:44px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.logo-circle{width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.logo-text{font-weight:700;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--coral-light)}
+.header h1{font-family:"Playfair Display",serif;font-size:clamp(24px,4.5vw,36px);font-weight:700;line-height:1.15;color:var(--text);margin-bottom:8px}
+.header h1 em{font-style:italic;color:var(--coral-light)}
+.header p{font-size:14px;color:var(--text-muted);line-height:1.7;max-width:420px}
+.intro-card{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.intro-card::after{content:"";position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(232,68,90,0.08),transparent 70%);pointer-events:none}
+.intro-card h2{font-size:20px;font-weight:600;margin-bottom:14px;color:var(--text)}
+.intro-card p{font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:12px}
+.intro-card p:last-of-type{margin-bottom:0}
+.snapshot-grid{background:var(--navy-3);border:1px solid var(--border-2);border-radius:10px;padding:18px;margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sg-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:600}
+.sg-value{font-size:15px;font-weight:600;color:var(--coral-light)}
+.intro-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.ipill{display:flex;align-items:center;gap:7px;background:var(--navy-3);border:1px solid var(--border-2);border-radius:100px;padding:6px 13px;font-size:12px;color:var(--text-muted);font-weight:500}
+.ipill-dot{width:5px;height:5px;border-radius:50%;background:var(--coral)}
+.btn-start{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:15px 44px;font-family:"Plus Jakarta Sans",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-block}
+.btn-start:hover{background:var(--coral-light);transform:translateY(-1px)}
+#chat-screen{display:none}
+.progress-wrap{margin-bottom:32px}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.prog-phase{font-size:11px;color:var(--coral);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.prog-track{height:2px;background:var(--navy-5);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--coral-light));border-radius:2px;transition:width 0.6s ease;width:0%}
+.messages{display:flex;flex-direction:column;gap:18px;margin-bottom:24px;min-height:100px}
+.msg{display:flex;gap:12px;animation:msgIn 0.35s ease forwards;opacity:0}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:2px}
+.msg-avatar.ai{background:var(--coral-dim);border:1px solid var(--coral-border);color:var(--coral-light)}
+.msg-avatar.user{background:var(--navy-3);border:1px solid var(--border-2);color:var(--text-muted);font-size:10px}
+.msg-bubble{flex:1;padding-top:4px}
+.msg-bubble .sender{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.msg-bubble.ai .sender{color:var(--coral)}
+.msg-bubble .text{font-size:15px;line-height:1.75;color:var(--text)}
+.msg-bubble.user .text{color:var(--text-muted)}
+.section-divider{display:flex;align-items:center;gap:12px;margin:4px 0;animation:msgIn 0.35s ease forwards;opacity:0}
+.section-divider::before,.section-divider::after{content:"";flex:1;height:1px;background:var(--border-2)}
+.section-divider span{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--coral);white-space:nowrap}
+.typing{display:flex;gap:12px;align-items:center}
+.typing-dots{display:flex;gap:5px;padding-top:6px}
+.typing-dots span{width:5px;height:5px;background:var(--coral);border-radius:50%;animation:tdot 1.2s infinite;opacity:0.35}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-5px);opacity:1}}
+.input-area{background:var(--navy-2);border:1px solid var(--border-2);border-radius:12px;padding:14px;transition:border-color 0.2s}
+.input-area:focus-within{border-color:var(--coral-border)}
+textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:"Plus Jakarta Sans",sans-serif;font-size:15px;font-weight:300;line-height:1.6;resize:none;min-height:56px;max-height:160px}
+textarea#user-input::placeholder{color:var(--text-dim)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--navy-4)}
+.mic-hint{font-size:11px;color:var(--text-dim)}
+.btn-send{background:var(--coral);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s}
+.btn-send:hover{background:var(--coral-light)}
+.btn-send:disabled{opacity:0.35;cursor:default}
+#complete-screen{display:none;text-align:center;padding:32px 0 0}
+.complete-mark{width:56px;height:56px;border-radius:14px;background:var(--coral-dim);border:1px solid var(--coral-border);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:20px}
+.complete-card{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:28px;margin:26px 0;text-align:left}
+.complete-card h3{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--coral-light)}
+.answer-item{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--navy-4)}
+.answer-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.answer-q{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;font-weight:600}
+.answer-a{font-size:14px;color:var(--text-muted);line-height:1.65}
+.roi-summary{background:var(--navy-3);border:1px solid var(--coral-border);border-radius:12px;padding:22px;margin-top:20px}
+.roi-section-head{font-size:11px;font-weight:700;color:var(--coral-light);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;margin-top:16px}
+.roi-section-head:first-child{margin-top:0}
+.roi-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--text-muted);margin-bottom:8px}
+.roi-row b{font-weight:700;color:var(--text);font-size:14px}
+.roi-subtotal{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;color:var(--coral-light);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-2)}
+.roi-reference{font-size:12px;color:var(--text-muted);padding:10px 0 4px;border-top:1px dashed var(--navy-5);margin-top:10px}
+.roi-reference span{color:var(--coral-light);font-weight:600}
+.roi-total{border-top:2px solid var(--coral-border);margin-top:14px;padding-top:12px;display:flex;justify-content:space-between;align-items:baseline;font-size:15px;font-weight:700;color:var(--coral-light)}
+.btn-submit{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:15px 36px;font-family:"Plus Jakarta Sans",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:8px}
+.btn-submit:hover{background:var(--coral-light);transform:translateY(-1px)}
+.submit-note{font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.5}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--navy-5);border-radius:2px}
+@media(max-width:480px){.page{padding:0 16px 60px}.header{padding:28px 0 28px}.intro-card{padding:24px 18px}.snapshot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo-row"><div class="logo-circle"></div><div class="logo-text">Business AI</div></div>
+    <h1>How much is the <em>quoting bottleneck</em> actually costing RMR?</h1>
+    <p>18 questions to put real numbers on missed profit, and what solving it would mean for the business and for you.</p>
+  </div>
+  <div id="intro-screen">
+    <div class="intro-card">
+      <h2>Hi Peter &#8212; before we meet.</h2>
+      <p>You already know the quoting bottleneck is costing you work. What we need before our session are the actual numbers &#8212; so when we sit down together we can show you precisely what it is worth to solve it, not just directionally but in dollars.</p>
+      <p>These questions move through where RMR is now, what the bottleneck is costing across both food and beverage and construction, where you want to take the business, and what solving it would mean for you and the team.</p>
+      <p>Takes about 15 minutes. Voice dictation works on mobile.</p>
+      <div class="snapshot-grid">
+        <div class="sg-item"><div class="sg-label">Business</div><div class="sg-value">RMR Engineering</div></div>
+        <div class="sg-item"><div class="sg-label">Location</div><div class="sg-value">Wodonga VIC</div></div>
+        <div class="sg-item"><div class="sg-label">Team</div><div class="sg-value">~40 staff</div></div>
+        <div class="sg-item"><div class="sg-label">Primary focus</div><div class="sg-value">Food &amp; beverage</div></div>
+      </div>
+      <div class="intro-pills">
+        <div class="ipill"><div class="ipill-dot"></div>~15 minutes</div>
+        <div class="ipill"><div class="ipill-dot"></div>Voice dictation supported</div>
+        <div class="ipill"><div class="ipill-dot"></div>Answers go straight to Tim</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="engineInit()">Let&#39;s go &rarr;</button>
+  </div>
+  <div id="chat-screen">
+    <div class="progress-wrap">
+      <div class="prog-meta">
+        <span class="prog-label" id="prog-label">Question 1 of 18</span>
+        <span class="prog-phase" id="prog-phase">Where you are now</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <textarea id="user-input" placeholder="Type your answer, or use your mic on mobile..." rows="3"></textarea>
+      <div class="input-footer">
+        <div class="mic-hint">&#127908; Tap mic on your keyboard to speak</div>
+        <button class="btn-send" id="send-btn" onclick="sendAnswer()">Send &rarr;</button>
+      </div>
+    </div>
+  </div>
+  <div id="complete-screen">
+    <div class="complete-mark">&#10003;</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:10px;">Done, Peter.</h2>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:460px;margin:0 auto;">Tim will review your answers before your session so you can get straight into solutions.</p>
+    <div class="complete-card">
+      <h3>Your answers</h3>
+      <div id="answers-summary"></div>
+      <div class="roi-summary" id="roi-summary" style="display:none">
+        <div class="roi-section-head">Missed profit &#8212; our calculation</div>
+        <div id="roi-rows-missed"></div>
+        <div class="roi-subtotal" id="roi-subtotal-missed"></div>
+        <div class="roi-reference" id="roi-reference-peter" style="display:none"></div>
+        <div class="roi-section-head" style="margin-top:16px">Cost of the human alternative</div>
+        <div id="roi-rows-human"></div>
+        <div class="roi-total"><span>Combined annual cost of status quo</span><span id="roi-total-val">-</span></div>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="submitAnswers()">Send to Tim &rarr;</button>
+    <p class="submit-note">Your answers will be sent directly to tim.ahern@businessai.com.au</p>
+  </div>
+</div>
+<script>
+var ACCESS_KEY = "be8e618e-19e3-4b81-abf3-eb903e6d11ad";
+
+var QUESTIONS = [
+  {section:"Where you are now", q:"RMR has been at this for a long time and you have built something genuinely solid -- food and beverage relationships, laser capability, materials handling, the lot. But right now, if you had to put a percentage on it -- what proportion of the quoting opportunities that come across your desk each week actually get a quote submitted?", key:"overall_quote_rate", label:"Proportion of opportunities that get a quote submitted"},
+  {q:"Of the ones that do not get quoted -- what is the main reason? Is it capacity, complexity of the tender pack, wrong type of work, or something else?", key:"main_reason_not_quoted", label:"Primary reason opportunities go unquoted"},
+  {q:"In food and beverage, where you win around 60 to 70 percent of what you quote -- roughly how many opportunities come in per month, and of those, how many quotes actually get submitted?", key:"fb_volume", label:"F&B opportunities in per month vs quotes submitted"},
+  {q:"On the construction side -- tender packs that land on your desk, sometimes with hundreds of drawings. How many of those come in per month, and of those, how many actually get a quote submitted?", key:"construction_volume", label:"Construction packs in per month vs quotes submitted"},
+  {q:"If your quoting process was streamlined and efficient -- document triage done automatically, relevant drawings identified, preliminary take-offs ready for your team to review -- how many construction tender packs per month would you realistically go after?", key:"construction_potential_volume", label:"Construction packs per month RMR would pursue with efficient quoting"},
+  {section:"What it is costing you", q:"On the food and beverage quotes that do not get submitted -- what is the average job value of a typical F&B opportunity you are missing out on?", key:"fb_avg_job_value", label:"Average F&B job value for unsubmitted quotes"},
+  {q:"On the construction side -- for the tender packs you are not getting to, what is the average value of the stainless steel scope that would be RMR's work inside those packs? Not the whole project -- just your slice.", key:"construction_avg_job_value", label:"Average construction job value (RMR scope only)"},
+  {q:"What is RMR's net profit margin currently -- the percentage you actually keep after all costs? Revenue numbers are interesting but it is the profit that tells the real story.", key:"net_margin_pct", label:"RMR net profit margin percentage"},
+  {q:"You win around 60 to 70 percent of the food and beverage work you quote. Applying that win rate to the F&B opportunities you are currently not getting to -- what do you think that is costing you in missed profit annually?", key:"fb_missed_profit", label:"Annual missed profit from unsubmitted F&B quotes"},
+  {q:"Construction win rates are lower -- around 25 to 30 percent. But even at that rate, across the construction packs you are not quoting -- what does the annual missed profit number look like on that side?", key:"construction_missed_profit", label:"Annual missed profit from unsubmitted construction quotes"},
+  {section:"Where you want to go", q:"If quoting capacity was not a constraint -- if you could submit on everything worth submitting -- where do you think RMR's revenue could realistically be in 24 months?", key:"revenue_potential", label:"RMR revenue potential in 24 months unconstrained"},
+  {q:"You mentioned wanting to grow food and beverage specifically. Is the goal to deepen relationships with existing clients like Mars and the major FMCG accounts, expand into new food and beverage clients, or both?", key:"growth_direction", label:"Growth direction -- existing vs new F&B clients"},
+  {q:"Beyond the revenue -- what does a bigger, more efficient RMR actually mean for the people in it? The estimators, the project guys, Craig your GM -- what changes for them if the quoting bottleneck is solved?", key:"team_impact", label:"Impact on the team if quoting bottleneck is solved"},
+  {q:"And what about for you personally -- the quoting bottleneck is solved, revenue is up, profit is where you want it, and the team are experiencing everything you just described -- what does all of that actually change for Peter Taylor?", key:"personal_impact", label:"Personal impact for Peter if business goals are achieved"},
+  {section:"What you have and what you need", q:"You have Monday as your current tendering and workflow tool. On a scale of one to ten, how well is it actually capturing the go and no-go discipline you had with HubSpot -- where it was rating tenders automatically and moving them through stages?", key:"monday_rating", label:"Monday.com rating vs HubSpot go/no-go system"},
+  {q:"You are advertising for a dedicated estimator right now. What is the annual cost of that role -- salary, super, on-costs -- and realistically how long before they are actually productive in your environment?", key:"estimator_cost", label:"Annual cost and time-to-productivity for a dedicated estimator"},
+  {section:"The comparison", q:"If an AI system could handle the document triage, drawing analysis, and preliminary take-offs for your repeatable categories -- handrails, benches, canopies, pipework -- and your estimators just reviewed and finalised, what do you think the realistic multiplier on quoting volume would be? Two times what you do now? Five times? More?", key:"volume_multiplier", label:"Realistic quoting volume multiplier with AI assistance"},
+  {q:"Last one. You have been around long enough to know that finding good estimators who understand fabrication and food and beverage is genuinely hard. If you could have that quoting capacity available in weeks rather than months -- without the hiring risk, the training time, or the salary overhead -- what would that be worth to RMR in the next 12 months?", key:"ai_solution_value", label:"What AI quoting capacity would be worth to RMR in 12 months"}
+];
+
+var PHASES = {0:"Where you are now", 5:"What it is costing you", 10:"Where you want to go", 14:"What you have and what you need", 16:"The comparison"};
+
+var REQUIREMENTS = {
+  1: "REQUIREMENT: Peter must give a percentage or rough fraction of opportunities that get quoted. If vague, ask: Of every 10 opportunities that land, roughly how many get a quote out the door? Do not advance without a figure.",
+  2: "REQUIREMENT: Peter must identify the primary reason opportunities go unquoted. A clear directional answer is sufficient. Advance once he has answered directly.",
+  3: "CRITICAL ROI FIELD: Peter must give (a) the number of F&B opportunities coming in per month AND (b) the number of quotes actually submitted per month. The unquoted volume is the difference between the two. If he only gives one figure, ask for the other. Do not advance without both numbers.",
+  4: "CRITICAL ROI FIELD: Peter must give (a) the number of construction tender packs coming in per month AND (b) the number actually quoted. Need both to understand current reality. Do not advance without both numbers.",
+  5: "CRITICAL ROI FIELD: Peter must give a specific number of construction tender packs per month he would realistically pursue if the quoting process was fast and efficient. This is the growth number -- the difference between this and the submitted figure from Q4 is the true monthly opportunity. If vague, ask: Give me a number -- how many per month would you go after if quoting was not the bottleneck? Do not advance without a specific number.",
+  6: "CRITICAL ROI FIELD: Peter must give a dollar figure for the average F&B job value on opportunities being missed. If a range is given, note both but use the midpoint. Do not suggest any number. Do not advance without a dollar figure.",
+  7: "CRITICAL ROI FIELD: Peter must give a dollar figure for the average value of RMR's stainless steel scope inside construction tender packs -- not the whole project, just their slice. Do not suggest any number. Do not advance without a dollar figure.",
+  8: "CRITICAL ROI FIELD: Peter must give a specific net profit margin percentage. More, reasonable, or industry standard are not acceptable answers. If vague, ask: What percentage of revenue is left as profit after all costs -- just give me the number. Do not suggest any number. Do not advance without a specific percentage.",
+  9: "CRITICAL ROI FIELD: Peter must give a dollar figure for annual missed profit on the F&B side. If he gives a revenue figure, ask him to apply his margin to convert it to profit. Do not suggest any number. Do not advance without a profit figure.",
+  10: "CRITICAL ROI FIELD: Peter must give a dollar figure for annual missed profit on the construction side. Same rule -- if revenue is given, ask for the profit figure. Do not suggest any number. Do not advance without a profit figure.",
+  11: "CRITICAL ROI FIELD: Peter must give a specific revenue figure and a timeframe. Do not advance without both.",
+  12: "REQUIREMENT: Peter must give a clear directional answer -- existing clients, new clients, or both. Qualitative answer is sufficient. Advance once answered directly.",
+  13: "REQUIREMENT: Peter must reflect genuinely on what changes for the team if the quoting bottleneck is solved. Looking for specific impacts on specific people or roles -- not just generic answers like everyone does better. If generic, ask: What specifically changes for Craig, or for your estimators day to day? Advance once there is genuine specific reflection.",
+  14: "SPECIAL REQUIREMENT: This question must be personalised by the AI using Peter's exact words from his Q13 answer about the team. Before asking, the AI must construct the question as follows: 'The quoting bottleneck is solved, revenue is up, profit is where you want it, [insert Peter's specific team impacts from Q13 here] -- what does all of that actually change for Peter Taylor?' Do NOT use generic language like the team experiences improvements. Use his actual words. This is a personal motivation question -- no dollar figure needed. Accept genuine personal reflection about what it means for him -- time, freedom, legacy, financial, stress, whatever it is. Advance once he has answered honestly.",
+  15: "REQUIREMENT: Peter must give a number rating out of ten. If vague, ask: Just give it a number -- how does Monday compare to the HubSpot system you described? Do not advance without a number.",
+  16: "CRITICAL ROI FIELD: Peter must give (a) a dollar figure for the annual cost of a dedicated estimator AND (b) a realistic timeframe before they would be productive. If he gives salary without on-costs, that is fine -- note it. Do not advance without both figures.",
+  17: "REQUIREMENT: Peter must give a multiplier or specific volume increase. Two times, five times, ten times -- any figure is acceptable. If vague, ask: Put a number on it -- how many times more quotes could get out the door? Do not advance without a figure.",
+  18: "CRITICAL ROI FIELD: This is the anchor number -- Peter's own valuation of what AI quoting capacity is worth to RMR in 12 months. If vague, ask: Put a dollar figure on it -- what would that be worth to the business in the next 12 months? Do not suggest any number. Do not advance without a dollar figure."
+};
+
+var BASE_PROMPT = "You are a sharp, peer-level AI assistant running a pre-session discovery for Business AI, an Australian AI automation company. You are talking to Peter Taylor, owner of RMR Engineering in Wodonga VIC -- a 40-person mechanical engineering business specialising in food and beverage (65% of work), with additional work in construction, defence, infrastructure, laser cutting, and materials handling. RMR works with major FMCG clients including Mars. Food and beverage win rate is 60-70%. Construction win rate is 25-30%. The core bottleneck is quoting capacity -- they regularly miss tenders because they do not have enough estimating resource to process them in time. Construction tenders are particularly painful because clients send hundreds of drawings and expect RMR to find their relevant scope inside massive packs. Peter estimates missed opportunities are in the millions annually. He is technically literate, analytically minded, knows his numbers, and has thought carefully about AI. He previously used HubSpot with an automated tender rating system (traffic lights -- green quote always, amber decide, red only if time). He now uses Monday.com. He has three Filipino staff in-house and two in the Philippines. He is advertising for a dedicated estimator. His GM Craig still does quoting alongside project management. Tone: peer-to-peer, direct, no fluff, respect his intelligence. He is an engineer -- he appreciates precision and logic over enthusiasm.";
+
+var ROLE_PROMPT = "The client has just answered a question. Your job: (1) Acknowledge in ONE short sentence -- peer level, direct, no corporate enthusiasm. (2) Check if the answer meets the QUESTION REQUIREMENT. (3) If YES -- append [ADVANCE] at the very end of your reply. (4) If NO -- ask ONE focused follow-up, one sentence only. (5) You may probe multiple times. Every reply either ends with [ADVANCE] or asks a follow-up, never both. CRITICAL RULE: NEVER suggest, imply, calculate or reference any specific dollar figure, percentage, or numerical estimate when probing. Peter must generate every number himself. Ask open questions only. Tone: direct, peer-level, precise. No bullet points. No lists. No sycophancy. SPECIAL RULE FOR Q13 (personal impact question): You must read Peter's exact answer to the previous question about team impact and weave his specific words into how you frame this question -- not generic language. The question becomes personal and specific to what he just said.";
+
+var currentQ = 0, answers = {}, conversationHistory = [], isWaiting = false, isProbing = false;
+
+function engineInit() {
+  document.getElementById("intro-screen").style.display = "none";
+  document.getElementById("chat-screen").style.display = "block";
+  askQuestion(0);
+  document.getElementById("user-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAnswer(); }
+  });
+}
+
+function updateProgress() {
+  var pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-label").textContent = "Question " + (Math.min(currentQ+1, QUESTIONS.length)) + " of " + QUESTIONS.length;
+  var phase = "Where you are now";
+  var keys = Object.keys(PHASES).map(Number).sort(function(a,b){return a-b;});
+  for (var i = 0; i < keys.length; i++) { if (currentQ >= keys[i]) phase = PHASES[keys[i]]; }
+  document.getElementById("prog-phase").textContent = phase;
+}
+
+function addMessage(role, text) {
+  var msgs = document.getElementById("messages");
+  if (role === "section") {
+    var d = document.createElement("div");
+    d.className = "section-divider"; d.style.animationDelay = "0.05s";
+    d.innerHTML = "<span>" + text + "</span>";
+    msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return;
+  }
+  var d = document.createElement("div");
+  d.className = "msg"; d.style.animationDelay = "0.05s";
+  var ai = role === "ai";
+  var avatar = document.createElement("div");
+  avatar.className = "msg-avatar " + (ai ? "ai" : "user");
+  avatar.textContent = ai ? "BAI" : "PT";
+  var bubble = document.createElement("div");
+  bubble.className = "msg-bubble " + (ai ? "ai" : "user");
+  var sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = ai ? "Business AI" : "Peter";
+  var textEl = document.createElement("div");
+  textEl.className = "text";
+  textEl.innerHTML = text.split("\n").join("<br>");
+  bubble.appendChild(sender); bubble.appendChild(textEl);
+  d.appendChild(avatar); d.appendChild(bubble);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  var msgs = document.getElementById("messages");
+  var d = document.createElement("div");
+  d.className = "typing"; d.id = "typing-indicator";
+  var av = document.createElement("div"); av.className = "msg-avatar ai"; av.textContent = "BAI";
+  var dots = document.createElement("div"); dots.className = "typing-dots";
+  dots.innerHTML = "<span></span><span></span><span></span>";
+  d.appendChild(av); d.appendChild(dots);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { var t = document.getElementById("typing-indicator"); if (t) t.remove(); }
+
+function askQuestion(index) {
+  updateProgress();
+  var q = QUESTIONS[index];
+  if (q.section) {
+    setTimeout(function() {
+      addMessage("section", q.section);
+      setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 350);
+    }, 200);
+  } else {
+    setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 300);
+  }
+}
+
+function enableInput() {
+  document.getElementById("user-input").disabled = false;
+  document.getElementById("send-btn").disabled = false;
+  document.getElementById("user-input").focus();
+  isWaiting = false;
+}
+
+function disableInput() {
+  document.getElementById("user-input").disabled = true;
+  document.getElementById("send-btn").disabled = true;
+  isWaiting = true;
+}
+
+async function sendAnswer() {
+  if (isWaiting) return;
+  var input = document.getElementById("user-input");
+  var text = input.value.trim();
+  if (!text) return;
+  disableInput();
+  addMessage("user", text);
+  input.value = "";
+  var q = QUESTIONS[currentQ];
+  if (isProbing) { answers[q.key] = (answers[q.key] || "") + " | " + text; }
+  else { answers[q.key] = text; }
+  conversationHistory.push({role:"user", content:text});
+  showTyping();
+  var teamImpactContext = answers["team_impact"] ? " CONTEXT FOR Q14: Peter's exact words about team impact were: \"" + answers["team_impact"] + "\" -- use these specific words when framing the personal impact question." : "";
+  var requirement = REQUIREMENTS[currentQ+1]
+    ? "\n\nQUESTION REQUIREMENT:\n" + REQUIREMENTS[currentQ+1] + teamImpactContext
+    : "\n\nQUESTION REQUIREMENT:\nIf the answer addresses the question with reasonable clarity, append [ADVANCE]. If vague or missing key information, ask one focused follow-up.";
+  var systemPrompt = BASE_PROMPT
+    + "\n\nYou are on question " + (currentQ+1) + " of " + QUESTIONS.length
+    + ". The question was: \"" + q.q + "\""
+    + "\n\n" + ROLE_PROMPT
+    + requirement;
+  var fetchWithTimeout = function(url, opts, ms) {
+    var controller = new AbortController();
+    var timer = setTimeout(function(){controller.abort();}, ms);
+    return fetch(url, Object.assign({}, opts, {signal:controller.signal})).finally(function(){clearTimeout(timer);});
+  };
+  try {
+    var response = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:300, system:systemPrompt, messages:conversationHistory})
+    }, 12000);
+    var data = await response.json();
+    removeTyping();
+    var aiReply = (data.content && data.content[0]) ? data.content[0].text : "";
+    var shouldAdvance = aiReply.includes("[ADVANCE]");
+    aiReply = aiReply.replace("[ADVANCE]", "").trim();
+    if (!aiReply) aiReply = shouldAdvance ? "Got it." : "Can you give me a bit more detail on that?";
+    conversationHistory.push({role:"assistant", content:aiReply});
+    addMessage("ai", aiReply);
+    if (shouldAdvance) {
+      isProbing = false;
+      currentQ++;
+      if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+      else { setTimeout(function(){showComplete();}, 900); }
+    } else {
+      isProbing = true;
+      enableInput();
+    }
+  } catch(err) {
+    removeTyping();
+    isProbing = false;
+    currentQ++;
+    if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+    else { setTimeout(function(){showComplete();}, 900); }
+  }
+}
+
+function extractLargestDollar(text) {
+  if (!text) return 0;
+  var matches = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)(?=[^a-z]|$)/gi));
+  var also = Array.from(text.matchAll(/[$]?(\d[\d,]*(?:\.\d+)?)/g));
+  var best = 0;
+  var process = function(arr, hasSuffix) {
+    for (var m of arr) {
+      var val = parseFloat(m[1].replace(/,/g,""));
+      if (hasSuffix) {
+        var sfx = (m[2]||"").toLowerCase();
+        if (sfx==="million"||sfx==="m") val*=1000000;
+        else if (sfx==="thousand"||sfx==="k") val*=1000;
+      }
+      if (val>=1000&&val>best) best=val;
+    }
+  };
+  process(matches, true);
+  process(also, false);
+  return best;
+}
+
+function extractRate(text) {
+  if (!text) return 0;
+  var matches = Array.from(text.matchAll(/[$]?(\d+(?:\.\d+)?)/g));
+  for (var m of matches) {
+    var val = parseFloat(m[1]);
+    if (val >= 1 && val <= 100) return val / 100;
+  }
+  return 0;
+}
+
+function extractCount(text) {
+  if (!text) return 0;
+  var m = text.match(/(\d+(?:\.\d+)?)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
+function extractMultiplier(text) {
+  if (!text) return 0;
+  var m = text.match(/(\d+(?:\.\d+)?)\s*(?:x|times?)/i);
+  if (m) return parseFloat(m[1]);
+  var n = text.match(/(\d+(?:\.\d+)?)/);
+  return n ? parseFloat(n[1]) : 0;
+}
+
+function fmt(n) {
+  if (n>=1000000) return "$"+(n/1000000).toFixed(1)+"M";
+  if (n>=1000) return "$"+Math.round(n/1000)+"K";
+  return "$"+Math.round(n).toLocaleString();
+}
+
+function parseTwoNumbers(text) {
+  // Extract first and second numbers from a string like "20 in, 12 quoted" or "about 15, maybe 8"
+  if (!text) return {first:0, second:0};
+  var nums = Array.from(text.matchAll(/(\d+(?:\.\d+)?)/g)).map(function(m){return parseFloat(m[1]);});
+  return {first: nums[0]||0, second: nums[1]||0};
+}
+
+function calcROI() {
+  var missedRows=[], humanRows=[], missedTotal=0, humanTotal=0, total=0;
+
+  // Get net margin
+  var marginPct = extractRate(answers["net_margin_pct"]||"");
+
+  // F&B missed profit
+  // (opportunities in - submitted) x avg job value x 65% win rate x margin
+  var fbNums = parseTwoNumbers(answers["fb_volume"]||"");
+  var fbIn = Math.max(fbNums.first, fbNums.second);
+  var fbSubmitted = Math.min(fbNums.first, fbNums.second);
+  var fbMissed = fbIn - fbSubmitted;
+  var fbAvgJob = extractLargestDollar(answers["fb_avg_job_value"]||"");
+  // Always use our calculation -- Peter's estimate is stored separately as reference only
+  if (fbMissed > 0 && fbAvgJob > 0 && marginPct > 0) {
+    var fbCalc = Math.round(fbMissed * fbAvgJob * 0.65 * marginPct * 12);
+    missedRows.push({label:"F&B: "+fbMissed+" unquoted/mth x "+fmt(fbAvgJob)+" avg x 65% win x "+Math.round(marginPct*100)+"% margin", val:fbCalc});
+    missedTotal += fbCalc;
+  }
+
+  // Construction missed profit
+  // Use potential volume (Q4b) minus currently submitted (Q4) as the true opportunity gap
+  var conNums = parseTwoNumbers(answers["construction_volume"]||"");
+  var conSubmitted = Math.min(conNums.first, conNums.second);
+  var conPotential = extractCount(answers["construction_potential_volume"]||"");
+  var conMissed = conPotential > conSubmitted ? conPotential - conSubmitted : 0;
+  var conAvgJob = extractLargestDollar(answers["construction_avg_job_value"]||"");
+
+  if (conMissed > 0 && conAvgJob > 0 && marginPct > 0) {
+    var conCalc = Math.round(conMissed * conAvgJob * 0.275 * marginPct * 12);
+    missedRows.push({label:"Construction: "+conMissed+" additional/mth x "+fmt(conAvgJob)+" avg x 27.5% win x "+Math.round(marginPct*100)+"% margin", val:conCalc});
+    missedTotal += conCalc;
+  }
+
+  // Human alternative -- dedicated estimator annual cost
+  var estimatorCost = extractLargestDollar(answers["estimator_cost"]||"");
+  if (estimatorCost > 0) {
+    humanRows.push({label:"Dedicated estimator annual cost (salary + on-costs)", val:estimatorCost});
+    humanTotal += estimatorCost;
+  }
+
+  total = missedTotal + humanTotal;
+  // Peter's own estimates -- reference only, not included in total
+  var peterFbMissed = extractLargestDollar(answers["fb_missed_profit"]||"");
+  var peterConMissed = extractLargestDollar(answers["construction_missed_profit"]||"");
+  var peterTotal = peterFbMissed + peterConMissed;
+
+  return {missedRows:missedRows, humanRows:humanRows, missedTotal:missedTotal, humanTotal:humanTotal, total:total, peterTotal:peterTotal};
+}
+
+function showComplete() {
+  document.getElementById("chat-screen").style.display = "none";
+  document.getElementById("complete-screen").style.display = "block";
+  window.scrollTo(0,0);
+  var el = document.getElementById("answers-summary"); el.innerHTML = "";
+  QUESTIONS.forEach(function(q) {
+    if (answers[q.key]) {
+      var d = document.createElement("div"); d.className = "answer-item";
+      var qq = document.createElement("div"); qq.className = "answer-q"; qq.textContent = q.label;
+      var aa = document.createElement("div"); aa.className = "answer-a"; aa.textContent = answers[q.key];
+      d.appendChild(qq); d.appendChild(aa); el.appendChild(d);
+    }
+  });
+  var roi = calcROI();
+  if ((roi.missedRows.length > 0 || roi.humanRows.length > 0) && roi.total > 0) {
+    document.getElementById("roi-summary").style.display = "block";
+    document.getElementById("roi-rows-missed").innerHTML = roi.missedRows.map(function(r){
+      return "<div class=\"roi-row\"><span>"+r.label+"</span><b>"+fmt(r.val)+"</b></div>";
+    }).join("");
+    if (roi.missedTotal > 0) {
+      document.getElementById("roi-subtotal-missed").innerHTML = "<span>Our calculation</span><b>"+fmt(roi.missedTotal)+"/yr</b>";
+    }
+    if (roi.peterTotal > 0) {
+      var refEl = document.getElementById("roi-reference-peter");
+      refEl.style.display = "block";
+      refEl.innerHTML = "Peter&#39;s own estimate: <span>"+fmt(roi.peterTotal)+"/yr</span> &mdash; for reference only, not included in total";
+    }
+    document.getElementById("roi-rows-human").innerHTML = roi.humanRows.map(function(r){
+      return "<div class=\"roi-row\"><span>"+r.label+"</span><b>"+fmt(r.val)+"</b></div>";
+    }).join("");
+    document.getElementById("roi-total-val").textContent = fmt(roi.total)+"/yr";
+  }
+}
+
+function submitAnswers() {
+  var btn = document.querySelector(".btn-submit");
+  var note = document.querySelector(".submit-note");
+  var body = "PRE-IMMERSION DISCOVERY - Peter Taylor - RMR Engineering\n" + "=".repeat(52) + "\n\n";
+  var roi = calcROI();
+  if (roi.total > 0) {
+    body += "--- ROI SNAPSHOT ---\n";
+    body += "MISSED PROFIT (ANNUAL):\n";
+    roi.missedRows.forEach(function(r){ body += "  " + r.label + ": " + fmt(r.val) + "\n"; });
+    body += "Subtotal: " + fmt(roi.missedTotal) + "/yr\n\n";
+    body += "HUMAN ALTERNATIVE:\n";
+    roi.humanRows.forEach(function(r){ body += "  " + r.label + ": " + fmt(r.val) + "\n"; });
+    body += "COMBINED TOTAL: " + fmt(roi.total) + "/yr\n\n";
+  }
+  QUESTIONS.forEach(function(q) {
+    if (q.section) body += "\n--- " + q.section.toUpperCase() + " ---\n\n";
+    if (answers[q.key]) body += "Q: " + q.label + "\nA: " + answers[q.key] + "\n\n";
+  });
+  btn.textContent = "Sending..."; btn.disabled = true;
+  fetch("https://api.web3forms.com/submit", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({access_key:ACCESS_KEY, subject:"Pre-Immersion Discovery - Peter Taylor - RMR Engineering", from_name:"Business AI Interview Forms", message:body})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (data.success) {
+      btn.textContent = "Sent to Tim";
+      if (note) note.textContent = "Your answers have been sent. Tim will review them before your session.";
+    } else {
+      btn.textContent = "Send to Tim"; btn.disabled = false;
+      if (note) note.textContent = "Something went wrong - please try again.";
+    }
+  })
+  .catch(function(){
+    btn.textContent = "Send to Tim"; btn.disabled = false;
+    if (note) note.textContent = "Something went wrong - please try again.";
+  });
+}
+</script>
+</body>
+</html>
