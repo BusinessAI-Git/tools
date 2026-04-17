@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quoting ROI Calculator — Business AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f5f0;
+    --surface: #ffffff;
+    --surface2: #eceae4;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.16);
+    --text: #18180e;
+    --text-muted: rgba(24,24,14,0.52);
+    --text-dim: rgba(24,24,14,0.32);
+    --blue: #1b5fa3;
+    --blue-dark: #134680;
+    --blue-bg: rgba(27,95,163,0.07);
+    --blue-border: rgba(27,95,163,0.2);
+    --amber: #b87200;
+    --amber-dark: #8a5500;
+    --amber-bg: rgba(184,114,0,0.08);
+    --amber-border: rgba(184,114,0,0.25);
+    --amber-highlight: #e08f00;
+    --red: #b83030;
+    --red-bg: rgba(184,48,48,0.07);
+    --accent: #1b5fa3;
+    --accent-dark: #134680;
+    --accent-glow: rgba(27,95,163,0.07);
+    --accent-bg: rgba(27,95,163,0.07);
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .header-left {}
+  .logo {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .logo span {
+    color: var(--accent);
+  }
+  h1 {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .subtitle {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 0.5px solid rgba(27,95,163,0.25);
+    padding: 6px 12px;
+    border-radius: 100px;
+    margin-top: 4px;
+  }
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* CONTROLS PANEL */
+  .panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .panel-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .slider-group {
+    margin-bottom: 22px;
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-name {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .slider-value {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--accent);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type="range"]:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    cursor: pointer;
+  }
+
+  .divider {
+    border: none;
+    border-top: 0.5px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* RIGHT COLUMN */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* METRIC CARDS ROW */
+  .metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--border-strong);
+  }
+  .metric-card.highlight::before {
+    background: var(--amber-highlight);
+  }
+  .metric-card.danger::before {
+    background: var(--red);
+  }
+  .metric-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .metric-num {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text);
+  }
+  .metric-num.green { color: var(--amber); }
+  .metric-num.red { color: var(--red); }
+  .metric-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* CHART PANEL */
+  .chart-panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .legend {
+    display: flex;
+    gap: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 200px;
+  }
+
+  /* INSIGHT STRIP */
+  .insight-strip {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .insight-divider {
+    background: var(--border);
+    height: 100%;
+    min-height: 48px;
+  }
+  .insight-block {}
+  .insight-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .insight-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .insight-text strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .insight-text .accent { color: var(--amber); font-family: var(--font-mono); }
+  .insight-text .danger { color: var(--red); font-family: var(--font-mono); }
+
+  /* ROI CALLOUT */
+  .roi-callout {
+    background: var(--amber-bg);
+    border: 0.5px solid var(--amber-border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .roi-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amber-dark);
+  }
+  .roi-number {
+    font-family: var(--font-mono);
+    font-size: 48px;
+    font-weight: 500;
+    color: var(--amber);
+    line-height: 1;
+  }
+  .roi-sub {
+    font-size: 12px;
+    color: rgba(184,114,0,0.6);
+    margin-top: 4px;
+  }
+  .roi-right {
+    text-align: right;
+  }
+  .roi-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 320px;
+    text-align: right;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-brand {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  .footer-brand span { color: var(--accent); }
+  .footer-note {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 16px; }
+    .roi-callout { flex-direction: column; align-items: flex-start; }
+    .roi-right { text-align: left; }
+    .roi-desc { text-align: left; }
+    .insight-strip { grid-template-columns: 1fr; }
+    .insight-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="header-left">
+      <p class="logo"><span>Business AI</span> — ROI Calculator</p>
+      <h1>What is your<br>quoting backlog<br><em>costing you?</em></h1>
+      <p class="subtitle">Adjust the sliders to model your business. See exactly how much revenue a broken quoting process is leaving on the table — every year.</p>
+    </div>
+    <div>
+      <div class="badge">Live model</div>
+    </div>
+  </header>
+
+  <div class="main-grid">
+
+    <div class="panel">
+      <p class="panel-title">Your business inputs</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Quotes available / month</span>
+          <span class="slider-value" id="v-quotes">12</span>
+        </div>
+        <input type="range" min="4" max="60" value="12" step="1" id="sl-quotes">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Average quote value</span>
+          <span class="slider-value" id="v-val">$65k</span>
+        </div>
+        <input type="range" min="5000" max="500000" value="65000" step="5000" id="sl-val">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Net margin</span>
+          <span class="slider-value" id="v-margin">26%</span>
+        </div>
+        <input type="range" min="5" max="60" value="26" step="1" id="sl-margin">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Win rate on quotes sent</span>
+          <span class="slider-value" id="v-win">55%</span>
+        </div>
+        <input type="range" min="10" max="90" value="55" step="5" id="sl-win">
+      </div>
+
+      <hr class="divider">
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Quotes missed or sent late</span>
+          <span class="slider-value" id="v-miss">30%</span>
+        </div>
+        <input type="range" min="5" max="80" value="30" step="5" id="sl-miss">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">BAI engagement cost</span>
+          <span class="slider-value" id="v-cost">$13,200</span>
+        </div>
+        <input type="range" min="2750" max="50000" value="13200" step="550" id="sl-cost">
+      </div>
+    </div>
+
+    <div class="right-col">
+
+      <div class="metric-row">
+        <div class="metric-card danger">
+          <p class="metric-tag">Revenue lost today</p>
+          <p class="metric-num red" id="m-lost">—</p>
+          <p class="metric-sub">annually from missed/late quotes</p>
+        </div>
+        <div class="metric-card highlight">
+          <p class="metric-tag">Revenue unlocked</p>
+          <p class="metric-num green" id="m-unlock">—</p>
+          <p class="metric-sub">annually if backlog solved</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-tag">Profit lost today</p>
+          <p class="metric-num red" id="m-plost">—</p>
+          <p class="metric-sub">net profit slipping through</p>
+        </div>
+        <div class="metric-card highlight">
+          <p class="metric-tag">Additional net profit</p>
+          <p class="metric-num green" id="m-pgain">—</p>
+          <p class="metric-sub">additional profit if solved</p>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="chart-header">
+          <span class="chart-title">Annual revenue comparison</span>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#dddbd4; border: 1px solid rgba(0,0,0,0.15);"></span>
+              Today
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#e08f00;"></span>
+              Unlocked
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="roiChart" role="img" aria-label="Bar chart comparing current and potential revenue and net profit">Revenue and profit comparison</canvas>
+        </div>
+      </div>
+
+      <div class="insight-strip">
+        <div class="insight-block">
+          <p class="insight-eyebrow">The leakage</p>
+          <p class="insight-text" id="txt-leakage">—</p>
+        </div>
+        <div class="insight-divider"></div>
+        <div class="insight-block">
+          <p class="insight-eyebrow">Payback period</p>
+          <p class="insight-text" id="txt-payback">—</p>
+        </div>
+      </div>
+
+      <div class="roi-callout">
+        <div>
+          <p class="roi-label">Year-one ROI</p>
+          <p class="roi-number" id="roi-num">—×</p>
+          <p class="roi-sub" id="roi-sub">return on engagement</p>
+        </div>
+        <div class="roi-right">
+          <p class="roi-desc" id="roi-desc">—</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-brand"><span>Business AI</span> · businessai.com.au · Do what only you can do.</p>
+    <p class="footer-note">Model uses inputs above · results are estimates</p>
+  </footer>
+
+</div>
+
+<script>
+  function fmt(n) {
+    if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+    if (n >= 1000) return '$' + Math.round(n/1000) + 'k';
+    return '$' + Math.round(n);
+  }
+  function fmtFull(n) {
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  const chart = new Chart(document.getElementById('roiChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Revenue — today', 'Revenue — unlocked', 'Net profit — today', 'Net profit — unlocked'],
+      datasets: [{
+        data: [0,0,0,0],
+        backgroundColor: ['#e8e5de','#e08f00','#e8e5de','#e08f00'],
+        borderColor: ['rgba(0,0,0,0.1)','#b87200','rgba(0,0,0,0.1)','#b87200'],
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          ticks: { callback: v => fmt(v), color: 'rgba(24,24,22,0.4)', font: { family: 'DM Mono', size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          border: { display: false }
+        },
+        x: {
+          ticks: { color: 'rgba(24,24,22,0.4)', font: { family: 'DM Mono', size: 10 } },
+          grid: { display: false },
+          border: { display: false }
+        }
+      }
+    }
+  });
+
+  function update() {
+    const quotes = +document.getElementById('sl-quotes').value;
+    const val = +document.getElementById('sl-val').value;
+    const margin = +document.getElementById('sl-margin').value / 100;
+    const win = +document.getElementById('sl-win').value / 100;
+    const miss = +document.getElementById('sl-miss').value / 100;
+    const cost = +document.getElementById('sl-cost').value;
+
+    document.getElementById('v-quotes').textContent = quotes;
+    document.getElementById('v-val').textContent = val >= 1000 ? '$' + Math.round(val/1000) + 'k' : '$' + val;
+    document.getElementById('v-margin').textContent = Math.round(document.getElementById('sl-margin').value) + '%';
+    document.getElementById('v-win').textContent = Math.round(document.getElementById('sl-win').value) + '%';
+    document.getElementById('v-miss').textContent = Math.round(document.getElementById('sl-miss').value) + '%';
+    document.getElementById('v-cost').textContent = fmtFull(cost);
+
+    const perYear = quotes * 12;
+    const sentNow = Math.round(perYear * (1 - miss));
+    const wonNow = Math.round(sentNow * win);
+    const revNow = wonNow * val;
+    const profNow = revNow * margin;
+
+    const sentFixed = perYear;
+    const wonFixed = Math.round(sentFixed * win);
+    const revFixed = wonFixed * val;
+    const profFixed = revFixed * margin;
+
+    const revLost = revFixed - revNow;
+    const profLost = profFixed - profNow;
+    const roiMult = profLost / cost;
+    const monthsBack = cost / (profLost / 12);
+
+    document.getElementById('m-lost').textContent = fmt(revLost);
+    document.getElementById('m-unlock').textContent = fmt(revFixed);
+    document.getElementById('m-plost').textContent = fmt(profLost);
+    document.getElementById('m-pgain').textContent = '+' + fmt(profLost);
+
+    chart.data.datasets[0].data = [
+      Math.round(revNow), Math.round(revFixed),
+      Math.round(profNow), Math.round(profFixed)
+    ];
+    chart.update();
+
+    document.getElementById('txt-leakage').innerHTML =
+      `At <strong class="accent">${Math.round(miss*100)}%</strong> missed or delayed, you're leaving <strong>${fmt(revLost)}</strong> in revenue on the table — that's <strong class="danger">${fmt(profLost)}</strong> in net profit from work you've already done the site visit for.`;
+
+    const pb = monthsBack < 1 ? 'under 1 month' : Math.round(monthsBack) === 1 ? '1 month' : Math.round(monthsBack) + ' months';
+    document.getElementById('txt-payback').innerHTML =
+      `At an engagement cost of <strong>${fmtFull(cost)}</strong>, the additional profit of <strong class="accent">${fmt(profLost)}</strong> pays that back in <strong>${pb}</strong>.`;
+
+    document.getElementById('roi-num').textContent = roiMult >= 100 ? Math.round(roiMult) + '×' : roiMult.toFixed(1) + '×';
+    document.getElementById('roi-sub').textContent = 'return on a ' + fmtFull(cost) + ' engagement';
+    document.getElementById('roi-desc').textContent =
+      'For every dollar invested in solving this, the model returns ' + (roiMult >= 100 ? Math.round(roiMult) : roiMult.toFixed(1)) + ' dollars in additional net profit in year one alone.';
+  }
+
+  ['sl-quotes','sl-val','sl-margin','sl-win','sl-miss','sl-cost'].forEach(id => {
+    document.getElementById(id).addEventListener('input', update);
+  });
+  update();
+</script>
+</body>
+</html>
