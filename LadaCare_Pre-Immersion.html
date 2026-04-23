@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Business AI - Business Strategy Evaluation - LadaCare</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--coral:#E8445A;--coral-light:#F06B7C;--coral-dim:rgba(232,68,90,0.1);--coral-border:rgba(232,68,90,0.22);--navy:#0A1628;--navy-2:#0F1E35;--navy-3:#162440;--navy-4:#1E2E4A;--navy-5:#263855;--text:#F0F4FF;--text-muted:#8A9DBF;--text-dim:#3A4A6B;--border:rgba(240,244,255,0.07);--border-2:rgba(240,244,255,0.13)}
+:root{--coral:#F5A623;--coral-light:#FFB84D;--coral-dim:rgba(245,166,35,0.12);--coral-border:rgba(245,166,35,0.28);--navy:#111418;--navy-2:#191D23;--navy-3:#21262E;--navy-4:#2C3340;--navy-5:#3A4455;--text:#E8ECF0;--text-muted:#7A8899;--text-dim:#3D4A58;--border:rgba(232,236,240,0.07);--border-2:rgba(232,236,240,0.13)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--navy);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(232,68,90,0.07),transparent);pointer-events:none;z-index:0}
+body{background:var(--navy);color:var(--text);font-family:"Barlow",sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(245,166,35,0.07),transparent);pointer-events:none;z-index:0}
 .page{position:relative;z-index:1;width:100%;max-width:680px;padding:0 24px 80px}
 .header{padding:44px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px}
 .logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
 .logo-circle{width:8px;height:8px;border-radius:50%;background:var(--coral)}
 .logo-text{font-weight:700;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--coral-light)}
-.header h1{font-family:"Playfair Display",serif;font-size:clamp(24px,4.5vw,36px);font-weight:700;line-height:1.15;color:var(--text);margin-bottom:8px}
+.header h1{font-family:"Barlow Condensed",sans-serif;font-size:clamp(26px,4.5vw,42px);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:8px}
 .header h1 em{font-style:italic;color:var(--coral-light)}
 .header p{font-size:14px;color:var(--text-muted);line-height:1.7;max-width:420px}
 .intro-card{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden}
-.intro-card::after{content:"";position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(232,68,90,0.08),transparent 70%);pointer-events:none}
+.intro-card::after{content:"";position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(245,166,35,0.08),transparent 70%);pointer-events:none}
 .intro-card h2{font-size:20px;font-weight:600;margin-bottom:14px;color:var(--text)}
 .intro-card p{font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:12px}
 .intro-card p:last-of-type{margin-bottom:0}
@@ -29,7 +29,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellips
 .intro-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
 .ipill{display:flex;align-items:center;gap:7px;background:var(--navy-3);border:1px solid var(--border-2);border-radius:100px;padding:6px 13px;font-size:12px;color:var(--text-muted);font-weight:500}
 .ipill-dot{width:5px;height:5px;border-radius:50%;background:var(--coral)}
-.btn-start{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:15px 44px;font-family:"Plus Jakarta Sans",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-block}
+.btn-start{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:15px 44px;font-family:"Barlow",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-block}
 .btn-start:hover{background:var(--coral-light);transform:translateY(-1px)}
 #chat-screen{display:none}
 .progress-wrap{margin-bottom:32px}
@@ -60,31 +60,31 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-5px);opacity:1}}
 .input-area{background:var(--navy-2);border:1px solid var(--border-2);border-radius:12px;padding:14px;transition:border-color 0.2s}
 .input-area:focus-within{border-color:var(--coral-border)}
-textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:"Plus Jakarta Sans",sans-serif;font-size:15px;font-weight:300;line-height:1.6;resize:none;min-height:56px;max-height:160px}
+textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:"Barlow",sans-serif;font-size:15px;font-weight:300;line-height:1.6;resize:none;min-height:56px;max-height:160px}
 textarea#user-input::placeholder{color:var(--text-dim)}
 .input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--navy-4)}
 .mic-hint{font-size:11px;color:var(--text-dim)}
-.btn-send{background:var(--coral);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s}
+.btn-send{background:var(--coral);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s}
 .btn-send:hover{background:var(--coral-light)}
 .btn-send:disabled{opacity:0.35;cursor:default}
 #review-screen{display:none;padding:0 0 20px}
 .review-intro{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:28px;margin-bottom:28px}
-.review-intro h2{font-family:"Playfair Display",serif;font-size:24px;font-weight:700;margin-bottom:10px}
+.review-intro h2{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:700;margin-bottom:10px}
 .review-intro p{font-size:15px;color:var(--text-muted);line-height:1.65}
 .review-item{background:var(--navy-2);border:1px solid var(--border-2);border-radius:12px;padding:20px;margin-bottom:12px}
 .review-q{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;font-weight:600}
 .review-answer-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .review-a{font-size:15px;color:var(--text);line-height:1.6;flex:1}
-.btn-edit{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:5px 12px;font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:600;color:var(--coral-light);cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0}
+.btn-edit{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:5px 12px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:600;color:var(--coral-light);cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0}
 .btn-edit:hover{border-color:var(--coral-border);background:var(--coral-dim)}
 .edit-area{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2)}
-.edit-textarea{width:100%;background:var(--navy-3);border:1px solid var(--coral-border);border-radius:8px;padding:12px;font-family:"Plus Jakarta Sans",sans-serif;font-size:15px;font-weight:300;color:var(--text);line-height:1.6;resize:none;outline:none;min-height:60px}
+.edit-textarea{width:100%;background:var(--navy-3);border:1px solid var(--coral-border);border-radius:8px;padding:12px;font-family:"Barlow",sans-serif;font-size:15px;font-weight:300;color:var(--text);line-height:1.6;resize:none;outline:none;min-height:60px}
 .edit-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
-.btn-save{background:var(--coral);color:#fff;border:none;border-radius:6px;padding:7px 18px;font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:700;cursor:pointer}
-.btn-cancel{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:7px 18px;font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer}
+.btn-save{background:var(--coral);color:#fff;border:none;border-radius:6px;padding:7px 18px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.btn-cancel{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:7px 18px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer}
 .review-section-head{font-size:11px;font-weight:700;color:var(--coral);letter-spacing:0.14em;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border-2)}
 .review-section-head:first-child{margin-top:0}
-.btn-submit-final{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-family:"Plus Jakarta Sans",sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:20px;width:100%}
+.btn-submit-final{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-family:"Barlow",sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:20px;width:100%}
 .btn-submit-final:hover{background:var(--coral-light);transform:translateY(-1px)}
 .btn-submit-final:disabled{opacity:0.5;cursor:default;transform:none}
 .submit-note{font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.5;text-align:center}
@@ -101,7 +101,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
   <div class="header">
     <div class="logo-row"><div class="logo-circle"></div><div class="logo-text">Business AI</div></div>
     <h1>Let us understand <em>your business</em> before we meet.</h1>
-    <p>31 questions to give Tim a clear picture of where LadaCare is now, where you want it to go, and what is standing in the way.</p>
+    <p>32 questions to give Tim a clear picture of where LadaCare is now, where you want it to go, and what is standing in the way.</p>
   </div>
 
   <div id="intro-screen">
@@ -128,7 +128,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
   <div id="chat-screen">
     <div class="progress-wrap">
       <div class="prog-meta">
-        <span class="prog-label" id="prog-label">Question 1 of 31</span>
+        <span class="prog-label" id="prog-label">Question 1 of 32</span>
         <span class="prog-phase" id="prog-phase">Your team</span>
       </div>
       <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
@@ -145,7 +145,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
 
   <div id="review-screen">
     <div class="review-intro">
-      <h2>Almost done, Sarah.</h2>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:-0.01em">Almost done, Sarah.</h2>
       <p style="margin-bottom:10px">Here are all your answers. Review them and click <strong style="color:var(--coral-light)">Edit</strong> next to any you would like to change. When you are happy with everything, hit Submit at the bottom.</p>
     </div>
     <div id="review-content"></div>
@@ -155,7 +155,7 @@ textarea#user-input::placeholder{color:var(--text-dim)}
 
   <div id="complete-screen">
     <div class="complete-mark">&#10003;</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:30px;font-weight:700;margin-bottom:12px;">All done, Sarah.</h2>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;margin-bottom:12px;">All done, Sarah.</h2>
     <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:440px;margin:0 auto;">Tim has your answers and will review them before your session. Looking forward to the conversation.</p>
   </div>
 </div>
@@ -186,11 +186,12 @@ var QUESTIONS = [
   {q:"You have been at around $3M for about two and a half years. In your gut -- how much of that plateau do you think is directly linked to you being stuck in the day-to-day rather than focused on growth?", key:"plateau_reflection", label:"Reflection on plateau vs time trap connection"},
   {q:"How many hours a week do you and your team collectively spend on compliance-related work that generates no direct revenue -- incident management, policy reviews, document chasing, open disclosure meetings?", key:"compliance_hours", label:"Weekly hours on non-revenue compliance work", type:"hours"},
   {q:"You mentioned you have registered for three income streams but are currently only actively pursuing one. What are the other two income streams you have not yet had time to pursue?", key:"untapped_income_streams", label:"Untapped income streams not yet being pursued"},
-  {q:"What do you think each of those two income streams could realistically generate annually if you had the time to pursue them?", key:"untapped_income_value", label:"Estimated annual value of untapped income streams", type:"dollar", clarify:"Revenue figures are fine -- just a dollar estimate for each stream."},
+  {q:"In revenue terms -- what do you think each of those two income streams could realistically generate per year if you had the time to pursue them? Give me a separate revenue figure for each one.", key:"untapped_income_value", label:"Estimated annual revenue of untapped income streams (per stream)", type:"dollar", clarify:"We are looking for revenue figures -- just your best estimate for each stream separately."},
   {section:"Where you want to go", q:"If everything went well in the next 12 months, what would your revenue be?", key:"revenue_target_12m", label:"Revenue target in 12 months", type:"dollar"},
   {q:"What net margin percentage would you be running at in that scenario?", key:"margin_target_12m", label:"Target net margin percentage in 12 months", type:"percent"},
   {q:"Is the manufacturing acquisition -- the injection moulding business -- still in progress?", key:"acquisition_status", label:"Status of manufacturing acquisition"},
   {q:"What revenue do you expect that business to generate in year one once you own it?", key:"acquisition_year1_revenue", label:"Expected year one revenue from manufacturing acquisition", type:"dollar"},
+  {q:"And do you know what the net margin of that business is currently -- the percentage it keeps after all costs? If you are not sure, what would you hope or expect it to be?", key:"acquisition_margin", label:"Expected net margin percentage of manufacturing acquisition", type:"percent"},
   {q:"In the perfect world, how many hours a week would you spend working on the business and your broader empire -- rather than in the day-to-day?", key:"ideal_strategic_hours", label:"Ideal weekly hours working on the business", type:"hours"},
   {section:"What solving it unlocks", q:"What has been the key blocker stopping you from having those strategic hours available up until now?", key:"strategic_hours_blocker", label:"Key blocker to strategic hours"},
   {q:"If you could spend those hours on growth and your empire strategy -- what would that be worth to the business in dollar terms over the next 12 months?", key:"strategic_time_value", label:"Dollar value of strategic time recovered in 12 months", type:"dollar", clarify:"Revenue is fine -- just give us your best dollar estimate."},
