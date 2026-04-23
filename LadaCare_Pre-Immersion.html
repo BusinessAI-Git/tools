@@ -164,36 +164,36 @@ textarea#user-input::placeholder{color:var(--text-dim)}
 var ACCESS_KEY = "be8e618e-19e3-4b81-abf3-eb903e6d11ad";
 
 var QUESTIONS = [
-  {section:"Your team", q:"How many staff do you have working in the field?", key:"field_staff_count", label:"Field staff count"},
-  {q:"How many staff do you have in the office?", key:"office_staff_count", label:"Office staff count"},
-  {q:"Of your office staff, how many are full time?", key:"office_fulltime_count", label:"Full-time office staff count"},
-  {q:"What is the average annual salary of your full-time office staff?", key:"office_avg_salary", label:"Average annual salary of full-time office staff"},
-  {q:"On average, how many hours per week does each employee work?", key:"avg_hours_per_employee", label:"Average hours worked per week per employee"},
-  {section:"Your clients", q:"How many clients do you currently have?", key:"client_count", label:"Current client count"},
+  {section:"Your team", q:"How many staff do you have working in the field?", key:"field_staff_count", label:"Field staff count", type:"count"},
+  {q:"How many staff do you have in the office?", key:"office_staff_count", label:"Office staff count", type:"count"},
+  {q:"Of your office staff, how many are full time?", key:"office_fulltime_count", label:"Full-time office staff count", type:"count"},
+  {q:"What is the average annual salary of your full-time office staff?", key:"office_avg_salary", label:"Average annual salary of full-time office staff", type:"dollar", clarify:"Just base wages is fine, superannuation does not need to be included."},
+  {q:"On average, how many hours per week does each employee work?", key:"avg_hours_per_employee", label:"Average hours worked per week per employee", type:"hours"},
+  {section:"Your clients", q:"How many clients do you currently have?", key:"client_count", label:"Current client count", type:"count"},
   {q:"With your current staffing levels, are you at capacity -- could you take on more clients right now?", key:"at_capacity", label:"Whether business is currently at client capacity"},
-  {q:"How many clients would you ideally like to have?", key:"ideal_client_count", label:"Ideal client count"},
+  {q:"How many clients would you ideally like to have?", key:"ideal_client_count", label:"Ideal client count", type:"count"},
   {q:"What is the key factor stopping you from having that many clients already?", key:"client_growth_blocker", label:"Key blocker to reaching ideal client count"},
-  {q:"What is the average annual value of a client to the business?", key:"client_avg_annual_value", label:"Average annual value per client"},
+  {q:"What is the average annual value of a client to the business?", key:"client_avg_annual_value", label:"Average annual value per client", type:"dollar", clarify:"In dollar terms -- the annual revenue a typical client brings in."},
   {q:"How long do clients typically stay with you?", key:"client_retention_period", label:"Average client retention period"},
-  {section:"The numbers -- FY2025", q:"What was your total revenue for the 2025 financial year?", key:"revenue_2025", label:"Total revenue FY2025"},
-  {q:"What was your net margin percentage for FY2025 -- the percentage of revenue you actually kept after all costs?", key:"margin_2025", label:"Net margin percentage FY2025"},
-  {section:"The numbers -- FY2026", q:"What is your expected total revenue for the current financial year?", key:"revenue_2026", label:"Expected total revenue FY2026"},
-  {q:"What net margin percentage do you expect to finish the current financial year on?", key:"margin_2026", label:"Expected net margin percentage FY2026"},
-  {section:"The cost of the bottleneck", q:"What do you pay yourself annually -- salary, drawings, however you take it out of the business?", key:"owner_salary", label:"Owner annual remuneration"},
-  {q:"How many hours a week do you work in total?", key:"owner_total_hours", label:"Owner total hours per week"},
-  {q:"Of those hours, how many would you say are genuinely strategic -- working on the business, growth, acquisitions, building relationships?", key:"owner_strategic_hours", label:"Owner strategic hours per week"},
-  {q:"And how many of those hours are spent working in the business -- being the hub that everything flows through, answering emails, managing staff, approving timesheets, chasing compliance?", key:"owner_operational_hours", label:"Owner operational hours per week"},
+  {section:"The numbers -- FY2025", q:"What was your total revenue for the 2025 financial year?", key:"revenue_2025", label:"Total revenue FY2025", type:"dollar"},
+  {q:"What was your net margin percentage for FY2025 -- the percentage of revenue you actually kept after all costs?", key:"margin_2025", label:"Net margin percentage FY2025", type:"percent"},
+  {section:"The numbers -- FY2026", q:"What is your expected total revenue for the current financial year?", key:"revenue_2026", label:"Expected total revenue FY2026", type:"dollar"},
+  {q:"What net margin percentage do you expect to finish the current financial year on?", key:"margin_2026", label:"Expected net margin percentage FY2026", type:"percent"},
+  {section:"The cost of the bottleneck", q:"What do you pay yourself annually -- salary, drawings, however you take it out of the business?", key:"owner_salary", label:"Owner annual remuneration", type:"dollar", clarify:"Just the base amount is fine, superannuation does not need to be included."},
+  {q:"How many hours a week do you work in total?", key:"owner_total_hours", label:"Owner total hours per week", type:"hours"},
+  {q:"Of those hours, how many would you say are genuinely strategic -- working on the business, growth, acquisitions, building relationships?", key:"owner_strategic_hours", label:"Owner strategic hours per week", type:"hours"},
+  {q:"And how many of those hours are spent working in the business -- being the hub that everything flows through, answering emails, managing staff, approving timesheets, chasing compliance?", key:"owner_operational_hours", label:"Owner operational hours per week", type:"hours"},
   {q:"You have been at around $3M for about two and a half years. In your gut -- how much of that plateau do you think is directly linked to you being stuck in the day-to-day rather than focused on growth?", key:"plateau_reflection", label:"Reflection on plateau vs time trap connection"},
-  {q:"How many hours a week do you and your team collectively spend on compliance-related work that generates no direct revenue -- incident management, policy reviews, document chasing, open disclosure meetings?", key:"compliance_hours", label:"Weekly hours on non-revenue compliance work"},
+  {q:"How many hours a week do you and your team collectively spend on compliance-related work that generates no direct revenue -- incident management, policy reviews, document chasing, open disclosure meetings?", key:"compliance_hours", label:"Weekly hours on non-revenue compliance work", type:"hours"},
   {q:"You mentioned you have registered for three income streams but are currently only actively pursuing one. What are the other two income streams you have not yet had time to pursue?", key:"untapped_income_streams", label:"Untapped income streams not yet being pursued"},
-  {q:"What do you think each of those two income streams could realistically generate annually if you had the time to pursue them?", key:"untapped_income_value", label:"Estimated annual value of untapped income streams"},
-  {section:"Where you want to go", q:"If everything went well in the next 12 months, what would your revenue be?", key:"revenue_target_12m", label:"Revenue target in 12 months"},
-  {q:"What net margin percentage would you be running at in that scenario?", key:"margin_target_12m", label:"Target net margin percentage in 12 months"},
+  {q:"What do you think each of those two income streams could realistically generate annually if you had the time to pursue them?", key:"untapped_income_value", label:"Estimated annual value of untapped income streams", type:"dollar", clarify:"Revenue figures are fine -- just a dollar estimate for each stream."},
+  {section:"Where you want to go", q:"If everything went well in the next 12 months, what would your revenue be?", key:"revenue_target_12m", label:"Revenue target in 12 months", type:"dollar"},
+  {q:"What net margin percentage would you be running at in that scenario?", key:"margin_target_12m", label:"Target net margin percentage in 12 months", type:"percent"},
   {q:"Is the manufacturing acquisition -- the injection moulding business -- still in progress?", key:"acquisition_status", label:"Status of manufacturing acquisition"},
-  {q:"What revenue do you expect that business to generate in year one once you own it?", key:"acquisition_year1_revenue", label:"Expected year one revenue from manufacturing acquisition"},
-  {q:"In the perfect world, how many hours a week would you spend working on the business and your broader empire -- rather than in the day-to-day?", key:"ideal_strategic_hours", label:"Ideal weekly hours working on the business"},
+  {q:"What revenue do you expect that business to generate in year one once you own it?", key:"acquisition_year1_revenue", label:"Expected year one revenue from manufacturing acquisition", type:"dollar"},
+  {q:"In the perfect world, how many hours a week would you spend working on the business and your broader empire -- rather than in the day-to-day?", key:"ideal_strategic_hours", label:"Ideal weekly hours working on the business", type:"hours"},
   {section:"What solving it unlocks", q:"What has been the key blocker stopping you from having those strategic hours available up until now?", key:"strategic_hours_blocker", label:"Key blocker to strategic hours"},
-  {q:"If you could spend those hours on growth and your empire strategy -- what would that be worth to the business in dollar terms over the next 12 months?", key:"strategic_time_value", label:"Dollar value of strategic time recovered in 12 months"},
+  {q:"If you could spend those hours on growth and your empire strategy -- what would that be worth to the business in dollar terms over the next 12 months?", key:"strategic_time_value", label:"Dollar value of strategic time recovered in 12 months", type:"dollar", clarify:"Revenue is fine -- just give us your best dollar estimate."},
   {q:"And what would having that time back mean for you personally -- not just financially, but to you as a person?", key:"personal_impact", label:"Personal impact of having strategic time back"}
 ];
 
@@ -238,6 +238,70 @@ var BASE_PROMPT = "You are a warm, direct AI assistant gathering pre-session inf
 var ROLE_PROMPT = "The client has just answered a question. Before you do anything else, run through these FOUR CHECKS IN ORDER. You cannot append [ADVANCE] unless ALL checks pass. --- CHECK 1 - NONSENSE DETECTION: Does the answer bear any relevance to the question? If the answer is gibberish, random words, or clearly a voice dictation error (e.g. hot potato, baked potato, weeded duck feet), it FAILS. Do not advance. Say warmly it did not come through properly and ask the question again in your own words. --- CHECK 2 - CLARIFYING QUESTION DETECTION: Has Sarah responded with her own question instead of an answer (e.g. do you mean including super, are you talking revenue or profit)? If yes, it FAILS. Answer her clarifying question directly and concisely first, then ask her for the actual answer. Do not advance until she gives the actual answer. --- CHECK 3 - FORMAT CHECK: Does the answer match the required format? HOURS questions: must be a specific number of hours (e.g. 10, 25, 40). Reject percentages (about 50 percent) and vague words (most of them, all of them, a lot). Ask: Can you give me that as an actual number of hours per week? COUNT questions (staff, clients): must be a specific number. If the answer is a word like all of them, confirm the number from context if possible, otherwise ask for the actual number. DOLLAR questions: must contain a dollar figure, not a description. PERCENTAGE questions: a number without a percent sign is acceptable if context makes it clearly a percentage. If ambiguous ask to clarify. --- CHECK 4 - QUESTION REQUIREMENT: Does the answer meet the specific requirement listed for this question? --- Only if all four checks pass: acknowledge warmly in one short sentence then append [ADVANCE] at the very end. If any check fails: ask ONE focused follow-up only, never append [ADVANCE]. Never suggest specific numbers. Tone: warm, natural, conversational. No bullet points or lists in your response.";
 
 var currentQ = 0, answers = {}, conversationHistory = [], isWaiting = false, isProbing = false;
+
+function containsNumber(text) {
+  return /\d/.test(text);
+}
+
+function isLikelyNonsense(text) {
+  var t = text.trim().toLowerCase();
+  var words = t.split(/\s+/);
+  var hasNumber = containsNumber(text);
+  // Word numbers are valid answers
+  var hasWordNum = /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million)\b/.test(t);
+  var hasYesNo = /\b(yes|no|n\/a|both|all|none|not sure|unsure|still|maybe|probably|approximately|about|around|roughly|just|only)\b/.test(t);
+  var hasCommonWords = /\b(staff|client|hour|week|month|year|salary|revenue|margin|percent|business|office|field|full.time|part.time|time|work|manage|progress|acquisition|income|stream|compliance|strategic|operational|growth|profit)\b/.test(t);
+  if (!hasNumber && !hasWordNum && !hasYesNo && !hasCommonWords && words.length <= 5) return true;
+  return false;
+}
+
+function isClarifyingQuestion(text) {
+  // Ends with ? and is short -- likely a clarifying question not an answer
+  var trimmed = text.trim();
+  return trimmed.endsWith("?") && trimmed.split(/\s+/).length < 20;
+}
+
+function validateFormat(text, type) {
+  if (!type) return {ok:true};
+  var t = text.toLowerCase().trim();
+
+  if (type === "hours") {
+    // Reject vague qualitative answers regardless of numbers
+    if (/\b(all of them|most of them|hardly any|none of them|a lot of them)\b/.test(t)) return {ok:false, msg:"Can you give me a specific number of hours per week?"};
+    // Reject pure percentage answers
+    if (/\d+\s*%/.test(t) && !/(\d+)\s*(hours?|hrs?)/.test(t)) return {ok:false, msg:"Can you give me that as an actual number of hours rather than a percentage?"};
+    // Must contain a number
+    var wordNums2 = /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|twenty.five|thirty|thirty.five|forty|forty.five|fifty|sixty)\b/i;
+    if (!containsNumber(text) && !wordNums2.test(text)) return {ok:false, msg:"Can you give me that as an actual number of hours per week?"};
+    return {ok:true};
+  }
+
+  if (type === "count") {
+    var wordNums = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,fifty:50};
+    var hasWordNum = Object.keys(wordNums).some(function(w){ return new RegExp("\\b"+w+"\\b","i").test(text); });
+    if (!containsNumber(text) && !hasWordNum) {
+      // Check for all of them -- try to resolve from context
+      if (/\ball (of )?them\b/i.test(t)) return {ok:false, msg:"Just to confirm -- how many is that as a specific number?"};
+      return {ok:false, msg:"Can you give me a specific number?"};
+    }
+    return {ok:true};
+  }
+
+  if (type === "dollar") {
+    var wordNums3 = /\b(one|two|three|four|five|six|seven|eight|nine|ten|million|thousand|hundred)\b/i;
+    if (!containsNumber(text) && !wordNums3.test(text)) return {ok:false, msg:"Can you give me a dollar figure for that?"};
+    // Reject pure qualitative answers that happen to contain numbers but no dollar context
+    if (/\b(not sure|don.t know|no idea|unsure|unclear|maybe|perhaps)\b/.test(t) && !containsNumber(text)) return {ok:false, msg:"Even a rough estimate is fine -- can you give me a dollar figure?"};
+    return {ok:true};
+  }
+
+  if (type === "percent") {
+    if (!containsNumber(text)) return {ok:false, msg:"Can you give me that as a percentage number?"};
+    return {ok:true};
+  }
+
+  return {ok:true};
+}
 
 function engineInit() {
   document.getElementById("intro-screen").style.display = "none";
@@ -329,10 +393,40 @@ async function sendAnswer() {
   var input = document.getElementById("user-input");
   var text = input.value.trim();
   if (!text) return;
+  var q = QUESTIONS[currentQ];
+
+  // JS-side pre-validation -- catches nonsense, clarifying questions, and format errors
+  // before wasting an API call
+  if (isLikelyNonsense(text)) {
+    addMessage("user", text);
+    input.value = "";
+    addMessage("ai", "It looks like that might not have come through properly. " + q.q);
+    isProbing = true;
+    return;
+  }
+
+  if (isClarifyingQuestion(text) && q.clarify) {
+    addMessage("user", text);
+    input.value = "";
+    addMessage("ai", q.clarify + " So -- " + q.q);
+    isProbing = true;
+    return;
+  }
+
+  if (!isProbing) {
+    var fmtCheck = validateFormat(text, q.type);
+    if (!fmtCheck.ok) {
+      addMessage("user", text);
+      input.value = "";
+      addMessage("ai", fmtCheck.msg);
+      isProbing = true;
+      return;
+    }
+  }
+
   disableInput();
   addMessage("user", text);
   input.value = "";
-  var q = QUESTIONS[currentQ];
   if (isProbing) { answers[q.key] = (answers[q.key] || "") + " | " + text; }
   else { answers[q.key] = text; }
   conversationHistory.push({role:"user", content:text});
