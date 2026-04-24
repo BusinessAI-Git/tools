@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labour Cost Calculator — Custom Garage Doors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f5f0;
+    --surface: #ffffff;
+    --surface2: #eceae4;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.16);
+    --text: #0e0e08;
+    --text-muted: #4a4a3a;
+    --text-dim: #7a7a68;
+    --blue: #1b5fa3;
+    --blue-dark: #134680;
+    --blue-bg: rgba(27,95,163,0.07);
+    --blue-border: rgba(27,95,163,0.2);
+    --amber: #d4720a;
+    --amber-dark: #a35600;
+    --amber-bg: rgba(212,114,10,0.08);
+    --amber-border: rgba(212,114,10,0.28);
+    --amber-highlight: #f07d00;
+    --red: #b83030;
+    --red-bg: rgba(184,48,48,0.07);
+    --red-border: rgba(184,48,48,0.25);
+    --accent: #1b5fa3;
+    --accent-dark: #134680;
+    --accent-bg: rgba(27,95,163,0.07);
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .logo {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .logo span { color: var(--accent); }
+  h1 {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  h1 em { font-style: normal; color: var(--red); }
+  .subtitle {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+    max-width: 420px;
+    line-height: 1.6;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 0.5px solid rgba(27,95,163,0.25);
+    padding: 6px 12px;
+    border-radius: 100px;
+    margin-top: 4px;
+  }
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* PANEL */
+  .panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .panel-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .panel-section {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 24px 0 16px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--border);
+  }
+  .panel-section:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .slider-group { margin-bottom: 22px; }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-name { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+  .slider-value { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--text); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--accent);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    cursor: pointer;
+  }
+
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 20px 0; }
+
+  /* FIXED COST NOTE */
+  .fixed-note {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 6px;
+  }
+  .fixed-note-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .fixed-note-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .fixed-note-row:last-child { margin-bottom: 0; }
+  .fixed-note-row span { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+
+  /* RIGHT COLUMN */
+  .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* SUMMARY TOTAL */
+  .total-card {
+    background: var(--red-bg);
+    border: 0.5px solid var(--red-border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .total-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .total-number {
+    font-family: var(--font-mono);
+    font-size: 52px;
+    font-weight: 500;
+    color: var(--red);
+    line-height: 1;
+  }
+  .total-sub { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+  .total-right { text-align: right; }
+  .total-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 280px; }
+
+  /* BUCKET CARDS */
+  .bucket-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .bucket-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bucket-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .bucket-card.c-admin::before { background: #b83030; }
+  .bucket-card.c-wip::before   { background: #c0590a; }
+  .bucket-card.c-rework::before{ background: #1b5fa3; }
+  .bucket-card.c-sched::before { background: #6b45a0; }
+  .bucket-card.c-report::before{ background: #2a7a4a; }
+  .bucket-card.c-fixed::before { background: #7a7a68; }
+
+  .bucket-tag {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .bucket-num {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+  .bucket-hrs {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    font-family: var(--font-mono);
+  }
+  .bucket-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  /* CHART */
+  .chart-panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .chart-title { font-size: 13px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.05em; }
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* INSIGHT */
+  .insight-strip {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .insight-divider { background: var(--border); height: 100%; min-height: 48px; }
+  .insight-eyebrow { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+  .insight-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .insight-text strong { color: var(--text); font-weight: 500; }
+  .insight-text .hi-red { color: var(--red); font-family: var(--font-mono); }
+  .insight-text .hi-blue { color: var(--accent); font-family: var(--font-mono); }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-brand { font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
+  .footer-brand span { color: var(--accent); }
+  .footer-note { font-size: 11px; color: var(--text-dim); font-family: var(--font-mono); }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 16px; }
+    .total-card { flex-direction: column; align-items: flex-start; }
+    .total-right { text-align: left; }
+    .insight-strip { grid-template-columns: 1fr; }
+    .insight-divider { display: none; }
+    .bucket-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="header-left">
+      <p class="logo"><span>Business AI</span> — Labour Cost Calculator · Custom Garage Doors</p>
+      <h1>What is the status quo<br><em>costing you</em> in labour<br>every year?</h1>
+      <p class="subtitle">Adjust the sliders to match your numbers. See the annual labour cost draining into each operational pain point — in dollars.</p>
+    </div>
+    <div>
+      <div class="badge">Live model</div>
+    </div>
+  </header>
+
+  <div class="main-grid">
+
+    <!-- LEFT: SLIDERS -->
+    <div class="panel">
+      <p class="panel-title">Business inputs — adjust to your numbers</p>
+
+      <p class="panel-section">Base assumptions</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Staff hourly rate (avg)</span>
+          <span class="slider-value" id="v-rate">$40/hr</span>
+        </div>
+        <input type="range" min="30" max="80" value="40" step="1" id="sl-rate">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Installation jobs per year</span>
+          <span class="slider-value" id="v-jobs">500</span>
+        </div>
+        <input type="range" min="200" max="1000" value="500" step="25" id="sl-jobs">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Total staff headcount</span>
+          <span class="slider-value" id="v-staff">22</span>
+        </div>
+        <input type="range" min="10" max="40" value="22" step="1" id="sl-staff">
+      </div>
+
+      <p class="panel-section">Admin overhead per job</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Admin hours per install job</span>
+          <span class="slider-value" id="v-adminhrs">35 hrs</span>
+        </div>
+        <input type="range" min="10" max="60" value="35" step="1" id="sl-adminhrs">
+      </div>
+
+      <p class="panel-section">WIP &amp; job tracking</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">WIP time lost per person / week</span>
+          <span class="slider-value" id="v-wiphrs">1 hr</span>
+        </div>
+        <input type="range" min="0.5" max="5" value="1" step="0.5" id="sl-wiphrs">
+      </div>
+
+      <p class="panel-section">Rework &amp; warranty callbacks</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Rework / callback rate</span>
+          <span class="slider-value" id="v-rework">35%</span>
+        </div>
+        <input type="range" min="5" max="60" value="35" step="5" id="sl-rework">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Hours per rework visit (avg)</span>
+          <span class="slider-value" id="v-reworkhrs">4 hrs</span>
+        </div>
+        <input type="range" min="1" max="10" value="4" step="0.5" id="sl-reworkhrs">
+      </div>
+
+      <p class="panel-section">Reporting &amp; manual data work</p>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">Manual reporting hrs / week (Julia)</span>
+          <span class="slider-value" id="v-reporthrs">3 hrs</span>
+        </div>
+        <input type="range" min="1" max="15" value="3" step="0.5" id="sl-reporthrs">
+      </div>
+
+      <p class="panel-section">Fixed staff costs (not slider-driven)</p>
+
+      <div class="fixed-note">
+        <p class="fixed-note-label">Annual salary costs included in total</p>
+        <div class="fixed-note-row">
+          <span>Scheduling role (dedicated)</span>
+          <span>$85,000</span>
+        </div>
+        <div class="fixed-note-row">
+          <span>VA — debtor chasing (Philippines)</span>
+          <span>$20,000</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: OUTPUTS -->
+    <div class="right-col">
+
+      <!-- TOTAL -->
+      <div class="total-card">
+        <div>
+          <p class="total-label">Total annual labour cost of status quo</p>
+          <p class="total-number" id="m-total">—</p>
+          <p class="total-sub">every year, while nothing changes</p>
+        </div>
+        <div class="total-right">
+          <p class="total-desc" id="txt-total">—</p>
+        </div>
+      </div>
+
+      <!-- BUCKET BREAKDOWN -->
+      <div class="bucket-grid">
+
+        <div class="bucket-card c-admin">
+          <p class="bucket-tag">Admin overhead — install jobs</p>
+          <p class="bucket-num" id="b-admin">—</p>
+          <p class="bucket-hrs" id="b-admin-hrs">— hrs/yr</p>
+          <p class="bucket-desc">Hours spent on admin across the full install job lifecycle</p>
+        </div>
+
+        <div class="bucket-card c-wip">
+          <p class="bucket-tag">WIP &amp; job tracking inefficiency</p>
+          <p class="bucket-num" id="b-wip">—</p>
+          <p class="bucket-hrs" id="b-wip-hrs">— hrs/yr</p>
+          <p class="bucket-desc">Time lost per person per week chasing job status across 22 staff</p>
+        </div>
+
+        <div class="bucket-card c-rework">
+          <p class="bucket-tag">Rework &amp; warranty callbacks</p>
+          <p class="bucket-num" id="b-rework">—</p>
+          <p class="bucket-hrs" id="b-rework-hrs">— visits/yr · — hrs</p>
+          <p class="bucket-desc">Return site visits from poor pre-install information capture</p>
+        </div>
+
+        <div class="bucket-card c-report">
+          <p class="bucket-tag">Manual reporting (Julia)</p>
+          <p class="bucket-num" id="b-report">—</p>
+          <p class="bucket-hrs" id="b-report-hrs">— hrs/yr</p>
+          <p class="bucket-desc">GM-level time spent on manual data extraction and reporting</p>
+        </div>
+
+        <div class="bucket-card c-sched">
+          <p class="bucket-tag">Scheduling role (dedicated FTE)</p>
+          <p class="bucket-num">$85,000</p>
+          <p class="bucket-hrs">2,000 hrs/yr</p>
+          <p class="bucket-desc">Full-time role whose only function is scheduling — a system problem, not a people problem</p>
+        </div>
+
+        <div class="bucket-card c-fixed">
+          <p class="bucket-tag">VA — debtor chasing</p>
+          <p class="bucket-num">$20,000</p>
+          <p class="bucket-hrs">est. 1,600 hrs/yr offshore</p>
+          <p class="bucket-desc">Philippines VA hired solely to chase outstanding invoices — exists because collection isn't automated</p>
+        </div>
+
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-panel">
+        <div class="chart-header">
+          <span class="chart-title">Annual labour cost by pain bucket</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="costChart" role="img" aria-label="Bar chart of annual labour costs by pain bucket"></canvas>
+        </div>
+      </div>
+
+      <!-- INSIGHT STRIP -->
+      <div class="insight-strip">
+        <div class="insight-block">
+          <p class="insight-eyebrow">The hourly drain</p>
+          <p class="insight-text" id="txt-drain">—</p>
+        </div>
+        <div class="insight-divider"></div>
+        <div class="insight-block">
+          <p class="insight-eyebrow">Biggest single bucket</p>
+          <p class="insight-text" id="txt-biggest">—</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-brand"><span>Business AI</span> · businessai.com.au · Do what only you can do.</p>
+    <p class="footer-note">Model uses inputs above · all figures are estimates based on transcript data</p>
+  </footer>
+
+</div>
+
+<script>
+  var WEEKS = 48;
+  var FIXED_SCHED = 85000;
+  var FIXED_VA    = 20000;
+
+  function fmt(n) {
+    if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+    if (n >= 1000)    return '$' + Math.round(n/1000) + 'k';
+    return '$' + Math.round(n);
+  }
+  function fmtFull(n) {
+    return '$' + Math.round(n).toLocaleString();
+  }
+  function fmtHrs(n) {
+    if (n >= 1000) return Math.round(n).toLocaleString() + ' hrs/yr';
+    return Math.round(n) + ' hrs/yr';
+  }
+
+  var chart = new Chart(document.getElementById('costChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Admin\noverhead', 'WIP\ntracking', 'Rework\ncallbacks', 'Manual\nreporting', 'Scheduling\nrole', 'VA\ndebtors'],
+      datasets: [{
+        data: [0,0,0,0,FIXED_SCHED,FIXED_VA],
+        backgroundColor: ['#b83030','#c0590a','#1b5fa3','#2a7a4a','#6b45a0','#7a7a68'],
+        borderWidth: 0,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          ticks: { callback: function(v){ return fmt(v); }, color: '#4a4a3a', font: { family: 'DM Mono', size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          border: { display: false }
+        },
+        x: {
+          ticks: { color: '#4a4a3a', font: { family: 'DM Mono', size: 10 } },
+          grid: { display: false },
+          border: { display: false }
+        }
+      }
+    }
+  });
+
+  function update() {
+    var rate      = +document.getElementById('sl-rate').value;
+    var jobs      = +document.getElementById('sl-jobs').value;
+    var staff     = +document.getElementById('sl-staff').value;
+    var adminHrs  = +document.getElementById('sl-adminhrs').value;
+    var wipHrs    = +document.getElementById('sl-wiphrs').value;
+    var reworkPct = +document.getElementById('sl-rework').value / 100;
+    var reworkHrs = +document.getElementById('sl-reworkhrs').value;
+    var reportHrs = +document.getElementById('sl-reporthrs').value;
+
+    // Display slider values
+    document.getElementById('v-rate').textContent      = '$' + rate + '/hr';
+    document.getElementById('v-jobs').textContent      = jobs;
+    document.getElementById('v-staff').textContent     = staff;
+    document.getElementById('v-adminhrs').textContent  = adminHrs + ' hrs';
+    document.getElementById('v-wiphrs').textContent    = wipHrs + ' hr' + (wipHrs === 1 ? '' : 's');
+    document.getElementById('v-rework').textContent    = Math.round(reworkPct * 100) + '%';
+    document.getElementById('v-reworkhrs').textContent = reworkHrs + ' hrs';
+    document.getElementById('v-reporthrs').textContent = reportHrs + ' hrs';
+
+    // BUCKET 1: Admin overhead — install jobs
+    var adminTotalHrs  = adminHrs * jobs;
+    var adminCost      = adminTotalHrs * rate;
+
+    // BUCKET 2: WIP tracking inefficiency (all staff, per week)
+    var wipTotalHrs    = wipHrs * staff * WEEKS;
+    var wipCost        = wipTotalHrs * rate;
+
+    // BUCKET 3: Rework callbacks
+    var reworkVisits   = Math.round(jobs * reworkPct);
+    var reworkTotalHrs = reworkVisits * reworkHrs;
+    var reworkCost     = reworkTotalHrs * rate;
+
+    // BUCKET 4: Manual reporting (Julia — GM rate, same $40 default but uses rate slider)
+    var reportTotalHrs = reportHrs * WEEKS;
+    var reportCost     = reportTotalHrs * rate;
+
+    // FIXED
+    var totalVariable  = adminCost + wipCost + reworkCost + reportCost;
+    var totalFixed     = FIXED_SCHED + FIXED_VA;
+    var grandTotal     = totalVariable + totalFixed;
+
+    // Update bucket cards
+    document.getElementById('b-admin').textContent     = fmt(adminCost);
+    document.getElementById('b-admin-hrs').textContent = fmtHrs(adminTotalHrs);
+    document.getElementById('b-wip').textContent       = fmt(wipCost);
+    document.getElementById('b-wip-hrs').textContent   = fmtHrs(wipTotalHrs);
+    document.getElementById('b-rework').textContent    = fmt(reworkCost);
+    document.getElementById('b-rework-hrs').textContent = reworkVisits + ' visits · ' + Math.round(reworkTotalHrs).toLocaleString() + ' hrs';
+    document.getElementById('b-report').textContent    = fmt(reportCost);
+    document.getElementById('b-report-hrs').textContent = fmtHrs(reportTotalHrs);
+
+    // Update total
+    document.getElementById('m-total').textContent = fmtFull(grandTotal);
+    document.getElementById('txt-total').textContent =
+      'Across admin overhead, WIP inefficiency, rework visits, manual reporting, a dedicated scheduling FTE, and debtor chasing — all of it traceable to systems and processes that can be fixed.';
+
+    // Update chart
+    chart.data.datasets[0].data = [
+      Math.round(adminCost),
+      Math.round(wipCost),
+      Math.round(reworkCost),
+      Math.round(reportCost),
+      FIXED_SCHED,
+      FIXED_VA
+    ];
+    chart.update();
+
+    // Insight strip
+    var perWeek = grandTotal / 52;
+    document.getElementById('txt-drain').innerHTML =
+      'At current rates, this is costing <strong class="hi-red">' + fmtFull(Math.round(perWeek)) + '</strong> per week in labour — or <strong>' + fmtFull(Math.round(grandTotal / 365)) + '</strong> every single day the status quo holds.';
+
+    // Find biggest bucket
+    var buckets = [
+      { name: 'Install job admin overhead', val: adminCost },
+      { name: 'WIP tracking inefficiency', val: wipCost },
+      { name: 'Rework & warranty callbacks', val: reworkCost },
+      { name: 'Manual reporting', val: reportCost },
+      { name: 'Scheduling role', val: FIXED_SCHED },
+      { name: 'VA debtor chasing', val: FIXED_VA }
+    ];
+    buckets.sort(function(a,b){ return b.val - a.val; });
+    document.getElementById('txt-biggest').innerHTML =
+      '<strong>' + buckets[0].name + '</strong> is the largest single drain at <strong class="hi-red">' + fmtFull(Math.round(buckets[0].val)) + '/yr</strong> — ' + Math.round(buckets[0].val / grandTotal * 100) + '% of the total.';
+  }
+
+  ['sl-rate','sl-jobs','sl-staff','sl-adminhrs','sl-wiphrs','sl-rework','sl-reworkhrs','sl-reporthrs'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', update);
+  });
+
+  update();
+</script>
+</body>
+</html>
