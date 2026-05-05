@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business AI - Business Strategy Evaluation - Action Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--coral:#F5A623;--coral-light:#FFB84D;--coral-dim:rgba(245,166,35,0.12);--coral-border:rgba(245,166,35,0.28);--navy:#111418;--navy-2:#191D23;--navy-3:#21262E;--navy-4:#2C3340;--navy-5:#3A4455;--text:#E8ECF0;--text-muted:#7A8899;--text-dim:#3D4A58;--border:rgba(232,236,240,0.07);--border-2:rgba(232,236,240,0.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:"Barlow",sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(245,166,35,0.07),transparent);pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;width:100%;max-width:680px;padding:0 24px 80px}
+.header{padding:44px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.logo-circle{width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.logo-text{font-weight:700;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--coral-light)}
+.header h1{font-family:"Barlow Condensed",sans-serif;font-size:clamp(26px,4.5vw,42px);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:8px}
+.header h1 em{font-style:italic;color:var(--coral-light)}
+.header p{font-size:14px;color:var(--text-muted);line-height:1.7;max-width:420px}
+.intro-card{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.intro-card::after{content:"";position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(245,166,35,0.08),transparent 70%);pointer-events:none}
+.intro-card h2{font-size:20px;font-weight:600;margin-bottom:14px;color:var(--text)}
+.intro-card p{font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:12px}
+.intro-card p:last-of-type{margin-bottom:0}
+.snapshot-grid{background:var(--navy-3);border:1px solid var(--border-2);border-radius:10px;padding:18px;margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sg-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;font-weight:600}
+.sg-value{font-size:15px;font-weight:600;color:var(--coral-light)}
+.intro-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.ipill{display:flex;align-items:center;gap:7px;background:var(--navy-3);border:1px solid var(--border-2);border-radius:100px;padding:6px 13px;font-size:12px;color:var(--text-muted);font-weight:500}
+.ipill-dot{width:5px;height:5px;border-radius:50%;background:var(--coral)}
+.btn-start{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:15px 44px;font-family:"Barlow",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-block}
+.btn-start:hover{background:var(--coral-light);transform:translateY(-1px)}
+#chat-screen{display:none}
+.progress-wrap{margin-bottom:32px}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.prog-phase{font-size:11px;color:var(--coral);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.prog-track{height:2px;background:var(--navy-5);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--coral-light));border-radius:2px;transition:width 0.6s ease;width:0%}
+.messages{display:flex;flex-direction:column;gap:18px;margin-bottom:24px;min-height:100px}
+.msg{display:flex;gap:12px;animation:msgIn 0.35s ease forwards;opacity:0}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:2px}
+.msg-avatar.ai{background:var(--coral-dim);border:1px solid var(--coral-border);color:var(--coral-light)}
+.msg-avatar.user{background:var(--navy-3);border:1px solid var(--border-2);color:var(--text-muted);font-size:10px}
+.msg-bubble{flex:1;padding-top:4px}
+.msg-bubble .sender{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.msg-bubble.ai .sender{color:var(--coral)}
+.msg-bubble .text{font-size:15px;line-height:1.75;color:var(--text)}
+.msg-bubble.user .text{color:var(--text-muted)}
+.section-divider{display:flex;align-items:center;gap:12px;margin:4px 0;animation:msgIn 0.35s ease forwards;opacity:0}
+.section-divider::before,.section-divider::after{content:"";flex:1;height:1px;background:var(--border-2)}
+.section-divider span{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--coral);white-space:nowrap}
+.typing{display:flex;gap:12px;align-items:center}
+.typing-dots{display:flex;gap:5px;padding-top:6px}
+.typing-dots span{width:5px;height:5px;background:var(--coral);border-radius:50%;animation:tdot 1.2s infinite;opacity:0.35}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-5px);opacity:1}}
+.input-area{background:var(--navy-2);border:1px solid var(--border-2);border-radius:12px;padding:14px;transition:border-color 0.2s}
+.input-area:focus-within{border-color:var(--coral-border)}
+textarea#user-input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:"Barlow",sans-serif;font-size:15px;font-weight:300;line-height:1.6;resize:none;min-height:56px;max-height:160px}
+textarea#user-input::placeholder{color:var(--text-dim)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--navy-4)}
+.mic-hint{font-size:11px;color:var(--text-dim)}
+.btn-send{background:var(--coral);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s}
+.btn-send:hover{background:var(--coral-light)}
+.btn-send:disabled{opacity:0.35;cursor:default}
+#review-screen{display:none;padding:0 0 20px}
+.review-intro{background:var(--navy-2);border:1px solid var(--border-2);border-radius:16px;padding:28px;margin-bottom:28px}
+.review-intro h2{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:700;margin-bottom:10px}
+.review-intro p{font-size:15px;color:var(--text-muted);line-height:1.65}
+.review-item{background:var(--navy-2);border:1px solid var(--border-2);border-radius:12px;padding:20px;margin-bottom:12px}
+.review-q{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;font-weight:600}
+.review-answer-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.review-a{font-size:15px;color:var(--text);line-height:1.6;flex:1}
+.btn-edit{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:5px 12px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:600;color:var(--coral-light);cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0}
+.btn-edit:hover{border-color:var(--coral-border);background:var(--coral-dim)}
+.edit-area{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2)}
+.edit-textarea{width:100%;background:var(--navy-3);border:1px solid var(--coral-border);border-radius:8px;padding:12px;font-family:"Barlow",sans-serif;font-size:15px;font-weight:300;color:var(--text);line-height:1.6;resize:none;outline:none;min-height:60px}
+.edit-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.btn-save{background:var(--coral);color:#fff;border:none;border-radius:6px;padding:7px 18px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.btn-cancel{background:transparent;border:1px solid var(--border-2);border-radius:6px;padding:7px 18px;font-family:"Barlow",sans-serif;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer}
+.review-section-head{font-size:11px;font-weight:700;color:var(--coral);letter-spacing:0.14em;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border-2)}
+.review-section-head:first-child{margin-top:0}
+.btn-submit-final{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-family:"Barlow",sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:20px;width:100%}
+.btn-submit-final:hover{background:var(--coral-light);transform:translateY(-1px)}
+.btn-submit-final:disabled{opacity:0.5;cursor:default;transform:none}
+.submit-note{font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.5;text-align:center}
+#complete-screen{display:none;text-align:center;padding:60px 0}
+.complete-mark{width:72px;height:72px;border-radius:16px;background:var(--coral-dim);border:1px solid var(--coral-border);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:28px}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--navy-5);border-radius:2px}
+@media(max-width:480px){.page{padding:0 16px 60px}.header{padding:28px 0 28px}.intro-card{padding:24px 18px}.snapshot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo-row"><div class="logo-circle"></div><div class="logo-text">Business AI</div></div>
+    <h1>Let us understand <em>your business</em> before we meet.</h1>
+    <p>32 questions to give Tim a clear picture of where Action Care is now, where you want it to go, and what is standing in the way.</p>
+  </div>
+
+  <div id="intro-screen">
+    <div class="intro-card">
+      <h2>Hi Naz &#8212; before we meet.</h2>
+      <p>This is not a test and there are no wrong answers. We just need real numbers so that when we sit down together the conversation is about solutions, not setup.</p>
+      <p>These questions cover your team, your clients, your financials, and your time. Some will be quick. Some will make you think. All of them matter.</p>
+      <p>At the end you will get to review all your answers and change anything before you submit. Takes about 15 minutes. Voice dictation works on mobile.</p>
+      <div class="snapshot-grid">
+        <div class="sg-item"><div class="sg-label">Business</div><div class="sg-value">Action Care</div></div>
+        <div class="sg-item"><div class="sg-label">Location</div><div class="sg-value">Cairns &amp; Brisbane</div></div>
+        <div class="sg-item"><div class="sg-label">Sector</div><div class="sg-value">NDIS / Healthcare</div></div>
+        <div class="sg-item"><div class="sg-label">Goal</div><div class="sg-value">Financial freedom in 12 months</div></div>
+      </div>
+      <div class="intro-pills">
+        <div class="ipill"><div class="ipill-dot"></div>~15 minutes</div>
+        <div class="ipill"><div class="ipill-dot"></div>Voice dictation supported</div>
+        <div class="ipill"><div class="ipill-dot"></div>Review before submitting</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="engineInit()">Let&#39;s go &rarr;</button>
+  </div>
+
+  <div id="chat-screen">
+    <div class="progress-wrap">
+      <div class="prog-meta">
+        <span class="prog-label" id="prog-label">Question 1 of 32</span>
+        <span class="prog-phase" id="prog-phase">Your team</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <textarea id="user-input" placeholder="Type your answer, or use your mic on mobile..." rows="3"></textarea>
+      <div class="input-footer">
+        <div class="mic-hint">&#127908; Tap mic on your keyboard to speak</div>
+        <button class="btn-send" id="send-btn" onclick="sendAnswer()">Send &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="review-screen">
+    <div class="review-intro">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:-0.01em">Almost done, Naz.</h2>
+      <p style="margin-bottom:10px">Here are all your answers. Review them and click <strong style="color:var(--coral-light)">Edit</strong> next to any you would like to change. When you are happy with everything, hit Submit at the bottom.</p>
+    </div>
+    <div id="review-content"></div>
+    <button class="btn-submit-final" id="submit-final-btn" onclick="submitAnswers()">Submit to Tim &rarr;</button>
+    <p class="submit-note">Your answers will be sent directly to tim.ahern@businessai.com.au</p>
+  </div>
+
+  <div id="complete-screen">
+    <div class="complete-mark">&#10003;</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;margin-bottom:12px;">All done, Naz.</h2>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:440px;margin:0 auto;">Tim has your answers and will review them before your session. Looking forward to the conversation.</p>
+  </div>
+</div>
+
+<script>
+var ACCESS_KEY = "be8e618e-19e3-4b81-abf3-eb903e6d11ad";
+
+var QUESTIONS = [
+  {section:"Your team", q:"How many staff do you have working in the field?", key:"field_staff_count", label:"Field staff count", type:"count"},
+  {q:"How many staff do you have in the office?", key:"office_staff_count", label:"Office staff count", type:"count"},
+  {q:"Of your office staff, how many are full time?", key:"office_fulltime_count", label:"Full-time office staff count", type:"count"},
+  {q:"What is the average annual salary of your full-time office staff?", key:"office_avg_salary", label:"Average annual salary of full-time office staff", type:"dollar", clarify:"Just base wages is fine, superannuation does not need to be included."},
+  {q:"On average, how many hours per week does each employee work?", key:"avg_hours_per_employee", label:"Average hours worked per week per employee", type:"hours"},
+  {section:"Your clients", q:"How many clients do you currently have?", key:"client_count", label:"Current client count", type:"count"},
+  {q:"One of your clients accounts for the majority of your current revenue. Roughly what percentage of your total revenue does your largest client represent?", key:"largest_client_pct", label:"Revenue percentage from largest client", type:"percent"},
+  {q:"With your current staffing levels, are you at capacity -- could you take on more clients right now?", key:"at_capacity", label:"Whether business is currently at client capacity"},
+  {q:"How many clients would you ideally like to have?", key:"ideal_client_count", label:"Ideal client count", type:"count"},
+  {q:"What is the key factor stopping you from having that many clients already?", key:"client_growth_blocker", label:"Key blocker to reaching ideal client count"},
+  {q:"What is the average annual value of a client to the business?", key:"client_avg_annual_value", label:"Average annual value per client", type:"dollar", clarify:"In dollar terms -- the annual revenue a typical client brings in."},
+  {q:"How long do clients typically stay with you?", key:"client_retention_period", label:"Average client retention period"},
+  {section:"The numbers -- FY2025", q:"What was your total revenue for the 2025 financial year?", key:"revenue_2025", label:"Total revenue FY2025", type:"dollar"},
+  {q:"What was your net margin percentage for FY2025 -- the percentage of revenue you actually kept after all costs?", key:"margin_2025", label:"Net margin percentage FY2025", type:"percent"},
+  {section:"The numbers -- FY2026", q:"What is your expected total revenue for the current financial year?", key:"revenue_2026", label:"Expected total revenue FY2026", type:"dollar"},
+  {q:"What net margin percentage do you expect to finish the current financial year on?", key:"margin_2026", label:"Expected net margin percentage FY2026", type:"percent"},
+  {section:"The cost of the bottleneck", q:"What do you pay yourself annually -- salary, drawings, however you take it out of the business?", key:"owner_salary", label:"Owner annual remuneration", type:"dollar", clarify:"Just the base amount is fine, superannuation does not need to be included."},
+  {q:"How many hours a week do you work in total?", key:"owner_total_hours", label:"Owner total hours per week", type:"hours"},
+  {q:"Of those hours, how many would you say are genuinely strategic -- working on the business, growth, building relationships, pursuing new service streams?", key:"owner_strategic_hours", label:"Owner strategic hours per week", type:"hours"},
+  {q:"And how many of those hours are spent working in the business -- being the hub that everything flows through, answering emails, managing staff, rostering, processing payroll, chasing compliance?", key:"owner_operational_hours", label:"Owner operational hours per week", type:"hours"},
+  {q:"In your gut -- how much of your current revenue plateau do you think is directly linked to you being stuck in the day-to-day rather than focused on growth?", key:"plateau_reflection", label:"Reflection on plateau vs time trap connection"},
+  {q:"How many hours a week do you and your team collectively spend on compliance-related work that generates no direct revenue -- incident management, policy reviews, document chasing, NDIS reporting?", key:"compliance_hours", label:"Weekly hours on non-revenue compliance work", type:"hours"},
+  {q:"Your most complex client requires significant documentation -- incident reports, behaviour support notes, and NDIS-compliant write-ups. How many hours per week do you personally spend processing or reviewing that paperwork before it is submitted?", key:"complex_client_hours", label:"Weekly hours on complex client documentation", type:"hours"},
+  {q:"You are running multiple legal entities. How do you currently manage compliance reporting and obligations across them -- is it centralised or does each company handle its own?", key:"multi_entity_compliance", label:"How compliance is managed across multiple entities"},
+  {section:"Untapped opportunity", q:"Beyond your current NDIS work, what other service streams are you looking to bring on -- and what has stopped you from actively pursuing them so far?", key:"untapped_streams", label:"Untapped service streams and blockers"},
+  {q:"In revenue terms -- what do you think each of those streams could realistically generate per year? Give me a separate figure for each one.", key:"untapped_stream_value", label:"Estimated annual revenue per untapped service stream", type:"dollar", clarify:"We are looking for revenue figures -- just your best estimate for each stream separately."},
+  {section:"Where you want to go", q:"If everything went well in the next 12 months, what would your revenue be?", key:"revenue_target_12m", label:"Revenue target in 12 months", type:"dollar"},
+  {q:"What net margin percentage would you be running at in that scenario?", key:"margin_target_12m", label:"Target net margin percentage in 12 months", type:"percent"},
+  {q:"In the perfect world, how many hours a week would you spend working on the business and your broader empire -- rather than in the day-to-day?", key:"ideal_strategic_hours", label:"Ideal weekly hours working on the business", type:"hours"},
+  {section:"What solving it unlocks", q:"What has been the key blocker stopping you from having those strategic hours available up until now?", key:"strategic_hours_blocker", label:"Key blocker to strategic hours"},
+  {q:"If you could spend those hours on growth and your empire strategy -- what would that be worth to the business in dollar terms over the next 12 months?", key:"strategic_time_value", label:"Dollar value of strategic time recovered in 12 months", type:"dollar", clarify:"Revenue is fine -- just give us your best dollar estimate."},
+  {q:"And what would having that time back mean for you personally -- not just financially, but to you as a person?", key:"personal_impact", label:"Personal impact of having strategic time back"}
+];
+
+var PHASES = {0:"Your team", 5:"Your clients", 12:"The numbers", 16:"The bottleneck", 24:"Untapped opportunity", 26:"Where you want to go", 29:"What it unlocks"};
+
+var REQUIREMENTS = {
+  1: "REQUIREMENT: Naz must give a specific number of field staff. If she gives a range, ask her to give a single best figure. Do not advance without a number.",
+  2: "REQUIREMENT: Naz must give a specific number of office staff. Do not advance without a number.",
+  3: "REQUIREMENT: Naz must give a specific number of full-time office staff. Do not advance without a number.",
+  4: "CRITICAL FIELD: Naz must give a dollar figure for average annual salary of full-time office staff. If she gives an hourly rate, ask her to convert to annual. Do not advance without a dollar figure.",
+  5: "CRITICAL FIELD: Naz must give a specific number of hours per week. If she gives a range, use the midpoint and confirm. Do not advance without a number.",
+  6: "REQUIREMENT: Naz must give a specific number of current clients. Do not advance without a number.",
+  7: "CRITICAL FIELD: Naz must give a specific percentage for her largest client's share of revenue. If she is unsure of the exact figure, ask her to estimate. Do not suggest any number. Do not advance without a percentage.",
+  8: "REQUIREMENT: Naz must give a clear yes or no answer on whether she is at capacity. If she hedges, ask: Just yes or no -- could you take on more clients with your current staff? Advance once she answers directly.",
+  9: "REQUIREMENT: Naz must give a specific number of ideal clients. Do not advance without a number.",
+  10: "REQUIREMENT: Naz must identify a specific key blocker -- not just a general answer. If vague, ask: What is the single biggest thing stopping you from having that many clients? Advance once there is a clear specific answer.",
+  11: "CRITICAL FIELD: Naz must give a dollar figure for average annual client value. Do not suggest any number. Do not advance without a dollar figure.",
+  12: "REQUIREMENT: Naz must give a time period for client retention -- months or years. Do not advance without a timeframe.",
+  13: "CRITICAL FIELD: Naz must give a specific dollar figure for FY2025 revenue. Do not advance without a dollar figure.",
+  14: "CRITICAL FIELD: Naz must give a specific percentage for FY2025 net margin. A number followed by percent or just the number if clearly a percentage. Do not advance without a percentage. If she says she does not know, ask her to estimate. Do not suggest any number.",
+  15: "CRITICAL FIELD: Naz must give a specific dollar figure for expected FY2026 revenue. Do not advance without a dollar figure.",
+  16: "CRITICAL FIELD: Naz must give a specific percentage for expected FY2026 net margin. Same rules as Q14 -- must be a percentage, not a description. Do not advance without a percentage.",
+  17: "CRITICAL FIELD: Naz must give a dollar figure for what she pays herself annually. If she is unsure of the exact figure, ask her to give her best estimate. Do not suggest any number. Do not advance without a dollar figure.",
+  18: "CRITICAL FIELD: Naz must give a specific number of total weekly hours. Do not advance without a number.",
+  19: "CRITICAL FIELD: Naz must give a specific number of strategic hours per week -- hours genuinely spent on growth and strategy. Do not advance without a number.",
+  20: "CRITICAL FIELD: Naz must give a specific number of operational hours per week -- hours spent in the day-to-day. If the strategic and operational hours she has given do not add up to her total, gently note this and ask her to confirm. Do not advance without a number.",
+  21: "REQUIREMENT: Naz must reflect genuinely on the connection between her time trap and the revenue plateau. A qualitative honest answer is fine. If she deflects or is vague, ask: In your own words, what do you think you could have achieved if you had had more strategic time? Advance once she has answered honestly.",
+  22: "CRITICAL FIELD: Naz must give a specific number of hours per week spent on compliance work across her and the team. Do not advance without a number.",
+  23: "CRITICAL FIELD: Naz must give a specific number of hours per week she personally spends on complex client documentation. Do not advance without a number.",
+  24: "REQUIREMENT: Naz must describe how compliance is currently managed across her entities -- centralised or per company. A clear descriptive answer is sufficient. If she is vague, ask: Does one person manage compliance for all entities, or does each company handle it separately? Advance once she has given a clear answer.",
+  25: "REQUIREMENT: Naz must name the specific service streams she wants to bring on and give at least one reason why she has not pursued them yet. If she only names one stream, ask: You mentioned aged care and veterans affairs -- are both still on your radar? Do not advance without both streams named and at least one blocker identified.",
+  26: "CRITICAL FIELD: Naz must give a dollar figure for each of the untapped service streams -- what each could generate annually. If she gives a combined figure, ask her to break it out. Do not suggest any number. Do not advance without dollar figures for both streams.",
+  27: "CRITICAL FIELD: Naz must give a specific dollar figure for her 12-month revenue target. Do not advance without a dollar figure.",
+  28: "CRITICAL FIELD: Naz must give a specific percentage for her target net margin in 12 months. Must be a percentage number. Do not advance without a percentage.",
+  29: "CRITICAL FIELD: Naz must give a specific number of hours per week she would ideally spend on strategic work. Do not advance without a number.",
+  30: "REQUIREMENT: Naz must identify a specific blocker -- not just time or being busy. Ask what specifically has made those strategic hours unavailable. Advance once there is a genuine specific answer.",
+  31: "CRITICAL FIELD: This is the anchor number. Naz must give a specific dollar figure for what her time back would be worth to the business in 12 months. If she is vague, ask: Put a dollar figure on it -- what would that be worth? Do not suggest any number. Do not advance without a dollar figure.",
+  32: "REQUIREMENT: This is the personal motivation question. No dollar figure needed. Looking for genuine honest reflection on what having her time back means for Naz personally -- not the business. If her answer is only about the business, ask: And beyond the business, what would it mean for you personally? Advance once she has answered from a personal not business perspective."
+};
+
+var BASE_PROMPT = "You are a warm, direct AI assistant gathering pre-session information for Business AI, an Australian AI automation company. You are talking to Naz (Nasim Maghsoodi), owner of Action Care Community Services -- an NDIS healthcare business operating across Cairns and Brisbane with around 10-15 staff. Naz is the central hub of the business -- all data and decisions flow through her. She does rostering on Sundays, processes payroll, manages compliance, and handles incident documentation for a high-needs SIL client. She is working to expand into aged care and Department of Veterans Affairs services. She attended an Empire event and is motivated and direct. She values honesty and straight talk. She has twin 11-year-old boys and wants her time back -- not just for the business but for her family. Tone: warm, direct, conversational -- not corporate. She responds well to acknowledgement and to feeling understood. This form has no ROI calculator -- it is purely gathering accurate information for Tim to analyse before their session.";
+
+var ROLE_PROMPT = "The client has just answered a question. Before you do anything else, run through these FOUR CHECKS IN ORDER. You cannot append [ADVANCE] unless ALL checks pass. --- CHECK 1 - NONSENSE DETECTION: Does the answer bear any relevance to the question? If the answer is gibberish, random words, or clearly a voice dictation error (e.g. hot potato, baked potato, weeded duck feet), it FAILS. Do not advance. Say warmly it did not come through properly and ask the question again in your own words. --- CHECK 2 - CLARIFYING QUESTION DETECTION: Has Naz responded with her own question instead of an answer (e.g. do you mean including super, are you talking revenue or profit)? If yes, it FAILS. Answer her clarifying question directly and concisely first, then ask her for the actual answer. Do not advance until she gives the actual answer. --- CHECK 3 - FORMAT CHECK: Does the answer match the required format? HOURS questions: must be a specific number of hours (e.g. 10, 25, 40). Reject percentages (about 50 percent) and vague words (most of them, all of them, a lot). Ask: Can you give me that as an actual number of hours per week? COUNT questions (staff, clients): must be a specific number. If the answer is a word like all of them, confirm the number from context if possible, otherwise ask for the actual number. DOLLAR questions: must contain a dollar figure, not a description. PERCENTAGE questions: a number without a percent sign is acceptable if context makes it clearly a percentage. If ambiguous ask to clarify. --- CHECK 4 - QUESTION REQUIREMENT: Does the answer meet the specific requirement listed for this question? --- Only if all four checks pass: acknowledge warmly in one short sentence then append [ADVANCE] at the very end. If any check fails: ask ONE focused follow-up only, never append [ADVANCE]. Never suggest specific numbers. Tone: warm, natural, conversational. No bullet points or lists in your response.";
+
+var currentQ = 0, answers = {}, conversationHistory = [], isWaiting = false, isProbing = false;
+
+function containsNumber(text) { return /\d/.test(text); }
+
+function isLikelyNonsense(text) {
+  var t = text.trim().toLowerCase();
+  var words = t.split(/\s+/);
+  var hasNumber = containsNumber(text);
+  var hasWordNum = /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million)\b/.test(t);
+  var hasYesNo = /\b(yes|no|n\/a|both|all|none|not sure|unsure|still|maybe|probably|approximately|about|around|roughly|just|only)\b/.test(t);
+  var hasCommonWords = /\b(staff|client|hour|week|month|year|salary|revenue|margin|percent|business|office|field|full.time|part.time|time|work|manage|progress|income|stream|compliance|strategic|operational|growth|profit|roster|payroll|entity|entities|aged|veteran|ndis|cairns|brisbane|centralised|centralized)\b/.test(t);
+  if (!hasNumber && !hasWordNum && !hasYesNo && !hasCommonWords && words.length <= 5) return true;
+  return false;
+}
+
+function isClarifyingQuestion(text) {
+  var trimmed = text.trim();
+  return trimmed.endsWith("?") && trimmed.split(/\s+/).length < 20;
+}
+
+function validateFormat(text, type) {
+  if (!type) return {ok:true};
+  var t = text.toLowerCase().trim();
+  if (type === "hours") {
+    if (/\b(all of them|most of them|hardly any|none of them|a lot of them)\b/.test(t)) return {ok:false, msg:"Can you give me a specific number of hours per week?"};
+    if (/\d+\s*%/.test(t) && !/(\d+)\s*(hours?|hrs?)/.test(t)) return {ok:false, msg:"Can you give me that as an actual number of hours rather than a percentage?"};
+    var wordNums2 = /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|twenty.five|thirty|thirty.five|forty|forty.five|fifty|sixty)\b/i;
+    if (!containsNumber(text) && !wordNums2.test(text)) return {ok:false, msg:"Can you give me that as an actual number of hours per week?"};
+    return {ok:true};
+  }
+  if (type === "count") {
+    var wordNums = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,fifty:50};
+    var hasWordNum = Object.keys(wordNums).some(function(w){ return new RegExp("\\b"+w+"\\b","i").test(text); });
+    if (!containsNumber(text) && !hasWordNum) {
+      if (/\ball (of )?them\b/i.test(t)) return {ok:false, msg:"Just to confirm -- how many is that as a specific number?"};
+      return {ok:false, msg:"Can you give me a specific number?"};
+    }
+    return {ok:true};
+  }
+  if (type === "dollar") {
+    var wordNums3 = /\b(one|two|three|four|five|six|seven|eight|nine|ten|million|thousand|hundred)\b/i;
+    if (!containsNumber(text) && !wordNums3.test(text)) return {ok:false, msg:"Can you give me a dollar figure for that?"};
+    if (/\b(not sure|don.t know|no idea|unsure|unclear|maybe|perhaps)\b/.test(t) && !containsNumber(text)) return {ok:false, msg:"Even a rough estimate is fine -- can you give me a dollar figure?"};
+    return {ok:true};
+  }
+  if (type === "percent") {
+    if (!containsNumber(text)) return {ok:false, msg:"Can you give me that as a percentage number?"};
+    return {ok:true};
+  }
+  return {ok:true};
+}
+
+function engineInit() {
+  document.getElementById("intro-screen").style.display = "none";
+  document.getElementById("chat-screen").style.display = "block";
+  askQuestion(0);
+  document.getElementById("user-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAnswer(); }
+  });
+}
+
+function updateProgress() {
+  var pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-label").textContent = "Question " + (Math.min(currentQ+1, QUESTIONS.length)) + " of " + QUESTIONS.length;
+  var phase = "Your team";
+  var keys = Object.keys(PHASES).map(Number).sort(function(a,b){return a-b;});
+  for (var i = 0; i < keys.length; i++) { if (currentQ >= keys[i]) phase = PHASES[keys[i]]; }
+  document.getElementById("prog-phase").textContent = phase;
+}
+
+function addMessage(role, text) {
+  var msgs = document.getElementById("messages");
+  if (role === "section") {
+    var d = document.createElement("div");
+    d.className = "section-divider"; d.style.animationDelay = "0.05s";
+    d.innerHTML = "<span>" + text + "</span>";
+    msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return;
+  }
+  var d = document.createElement("div");
+  d.className = "msg"; d.style.animationDelay = "0.05s";
+  var ai = role === "ai";
+  var avatar = document.createElement("div");
+  avatar.className = "msg-avatar " + (ai ? "ai" : "user");
+  avatar.textContent = ai ? "BAI" : "Naz";
+  var bubble = document.createElement("div");
+  bubble.className = "msg-bubble " + (ai ? "ai" : "user");
+  var sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = ai ? "Business AI" : "Naz";
+  var textEl = document.createElement("div");
+  textEl.className = "text";
+  textEl.innerHTML = text.split("\n").join("<br>");
+  bubble.appendChild(sender); bubble.appendChild(textEl);
+  d.appendChild(avatar); d.appendChild(bubble);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  var msgs = document.getElementById("messages");
+  var d = document.createElement("div");
+  d.className = "typing"; d.id = "typing-indicator";
+  var av = document.createElement("div"); av.className = "msg-avatar ai"; av.textContent = "BAI";
+  var dots = document.createElement("div"); dots.className = "typing-dots";
+  dots.innerHTML = "<span></span><span></span><span></span>";
+  d.appendChild(av); d.appendChild(dots);
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { var t = document.getElementById("typing-indicator"); if (t) t.remove(); }
+
+function askQuestion(index) {
+  updateProgress();
+  var q = QUESTIONS[index];
+  if (q.section) {
+    setTimeout(function() {
+      addMessage("section", q.section);
+      setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 350);
+    }, 200);
+  } else {
+    setTimeout(function() { addMessage("ai", q.q); enableInput(); }, 300);
+  }
+}
+
+function enableInput() {
+  document.getElementById("user-input").disabled = false;
+  document.getElementById("send-btn").disabled = false;
+  document.getElementById("user-input").focus();
+  isWaiting = false;
+}
+
+function disableInput() {
+  document.getElementById("user-input").disabled = true;
+  document.getElementById("send-btn").disabled = true;
+  isWaiting = true;
+}
+
+async function sendAnswer() {
+  if (isWaiting) return;
+  var input = document.getElementById("user-input");
+  var text = input.value.trim();
+  if (!text) return;
+  var q = QUESTIONS[currentQ];
+
+  if (isLikelyNonsense(text)) {
+    addMessage("user", text);
+    input.value = "";
+    addMessage("ai", "It looks like that might not have come through properly. " + q.q);
+    isProbing = true;
+    return;
+  }
+
+  if (isClarifyingQuestion(text) && q.clarify) {
+    addMessage("user", text);
+    input.value = "";
+    addMessage("ai", q.clarify + " So -- " + q.q);
+    isProbing = true;
+    return;
+  }
+
+  if (!isProbing) {
+    var fmtCheck = validateFormat(text, q.type);
+    if (!fmtCheck.ok) {
+      addMessage("user", text);
+      input.value = "";
+      addMessage("ai", fmtCheck.msg);
+      isProbing = true;
+      return;
+    }
+  }
+
+  disableInput();
+  addMessage("user", text);
+  input.value = "";
+  if (isProbing) { answers[q.key] = (answers[q.key] || "") + " | " + text; }
+  else { answers[q.key] = text; }
+  conversationHistory.push({role:"user", content:text});
+  showTyping();
+  var requirement = REQUIREMENTS[currentQ+1] ? " --- QUESTION REQUIREMENT: " + REQUIREMENTS[currentQ+1] : " --- QUESTION REQUIREMENT: If the answer addresses the question with reasonable clarity, append [ADVANCE]. If vague or missing key information, ask one focused follow-up.";
+  var systemPrompt = BASE_PROMPT + " --- You are on question " + (currentQ+1) + " of " + QUESTIONS.length + ". The question was: \"" + q.q + "\" --- " + ROLE_PROMPT + requirement;
+  var fetchWithTimeout = function(url, opts, ms) {
+    var controller = new AbortController();
+    var timer = setTimeout(function(){controller.abort();}, ms);
+    return fetch(url, Object.assign({}, opts, {signal:controller.signal})).finally(function(){clearTimeout(timer);});
+  };
+  try {
+    var response = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:300, system:systemPrompt, messages:conversationHistory})
+    }, 12000);
+    var data = await response.json();
+    removeTyping();
+    var aiReply = (data.content && data.content[0]) ? data.content[0].text : "";
+    var shouldAdvance = aiReply.includes("[ADVANCE]");
+    aiReply = aiReply.replace("[ADVANCE]", "").trim();
+    if (!aiReply) aiReply = shouldAdvance ? "Got it." : "Can you give me a bit more detail on that?";
+    conversationHistory.push({role:"assistant", content:aiReply});
+    addMessage("ai", aiReply);
+    if (shouldAdvance) {
+      isProbing = false;
+      currentQ++;
+      if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+      else { setTimeout(function(){showReview();}, 900); }
+    } else {
+      isProbing = true;
+      enableInput();
+    }
+  } catch(err) {
+    removeTyping();
+    isProbing = false;
+    currentQ++;
+    if (currentQ < QUESTIONS.length) { setTimeout(function(){askQuestion(currentQ);}, 700); }
+    else { setTimeout(function(){showReview();}, 900); }
+  }
+}
+
+function showReview() {
+  document.getElementById("chat-screen").style.display = "none";
+  document.getElementById("review-screen").style.display = "block";
+  window.scrollTo(0, 0);
+  var container = document.getElementById("review-content");
+  container.innerHTML = "";
+  var currentSection = null;
+  QUESTIONS.forEach(function(q) {
+    if (q.section && q.section !== currentSection) {
+      currentSection = q.section;
+      var sh = document.createElement("div");
+      sh.className = "review-section-head";
+      sh.textContent = q.section;
+      container.appendChild(sh);
+    }
+    if (!answers[q.key]) return;
+    var item = document.createElement("div");
+    item.className = "review-item";
+    item.id = "review-item-" + q.key;
+    var qLabel = document.createElement("div");
+    qLabel.className = "review-q";
+    qLabel.textContent = q.label;
+    var ansRow = document.createElement("div");
+    ansRow.className = "review-answer-row";
+    var ansText = document.createElement("div");
+    ansText.className = "review-a";
+    ansText.id = "review-a-" + q.key;
+    ansText.textContent = answers[q.key];
+    var editBtn = document.createElement("button");
+    editBtn.className = "btn-edit";
+    editBtn.textContent = "Edit";
+    editBtn.onclick = (function(key) { return function() { toggleEdit(key); }; })(q.key);
+    ansRow.appendChild(ansText);
+    ansRow.appendChild(editBtn);
+    var editArea = document.createElement("div");
+    editArea.className = "edit-area";
+    editArea.id = "edit-area-" + q.key;
+    var editTA = document.createElement("textarea");
+    editTA.className = "edit-textarea";
+    editTA.id = "edit-ta-" + q.key;
+    editTA.value = answers[q.key];
+    editTA.rows = 3;
+    var editActions = document.createElement("div");
+    editActions.className = "edit-actions";
+    var saveBtn = document.createElement("button");
+    saveBtn.className = "btn-save";
+    saveBtn.textContent = "Save";
+    saveBtn.onclick = (function(key) { return function() { saveEdit(key); }; })(q.key);
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn-cancel";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.onclick = (function(key) { return function() { cancelEdit(key); }; })(q.key);
+    editActions.appendChild(saveBtn);
+    editActions.appendChild(cancelBtn);
+    editArea.appendChild(editTA);
+    editArea.appendChild(editActions);
+    item.appendChild(qLabel);
+    item.appendChild(ansRow);
+    item.appendChild(editArea);
+    container.appendChild(item);
+  });
+}
+
+function toggleEdit(key) {
+  var area = document.getElementById("edit-area-" + key);
+  var ta = document.getElementById("edit-ta-" + key);
+  area.style.display = area.style.display === "block" ? "none" : "block";
+  if (area.style.display === "block") { ta.value = answers[key]; ta.focus(); }
+}
+
+function saveEdit(key) {
+  var ta = document.getElementById("edit-ta-" + key);
+  var newVal = ta.value.trim();
+  if (newVal) { answers[key] = newVal; document.getElementById("review-a-" + key).textContent = newVal; }
+  document.getElementById("edit-area-" + key).style.display = "none";
+}
+
+function cancelEdit(key) { document.getElementById("edit-area-" + key).style.display = "none"; }
+
+function submitAnswers() {
+  var btn = document.getElementById("submit-final-btn");
+  btn.textContent = "Sending...";
+  btn.disabled = true;
+  var body = "BUSINESS STRATEGY EVALUATION - Naz Maghsoodi - Action Care Community Services\n" + "=".repeat(60) + "\n\n";
+  var currentSection = null;
+  QUESTIONS.forEach(function(q) {
+    if (q.section && q.section !== currentSection) {
+      currentSection = q.section;
+      body += "\n--- " + q.section.toUpperCase() + " ---\n\n";
+    }
+    if (answers[q.key]) body += "Q: " + q.label + "\nA: " + answers[q.key] + "\n\n";
+  });
+  fetch("https://api.web3forms.com/submit", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({access_key:ACCESS_KEY, subject:"Business Strategy Evaluation - Naz Maghsoodi - Action Care", from_name:"Business AI Interview Forms", message:body})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (data.success) {
+      document.getElementById("review-screen").style.display = "none";
+      document.getElementById("complete-screen").style.display = "block";
+      window.scrollTo(0,0);
+    } else {
+      btn.textContent = "Submit to Tim \u2192";
+      btn.disabled = false;
+      alert("Something went wrong. Please try again.");
+    }
+  })
+  .catch(function(){
+    btn.textContent = "Submit to Tim \u2192";
+    btn.disabled = false;
+    alert("Something went wrong. Please try again.");
+  });
+}
+</script>
+</body>
+</html>
